@@ -14,6 +14,7 @@ Author your slides like a normal UI, then export crisp PNGs you can drop into Go
 
 - **Write slides as components**: compose layouts with React + Tailwind.
 - **Consistent look**: reusable slide frame, theme tokens, and common UI primitives.
+- **First class LaTeX support**: express math equations directly in your slides.
 - **Export to PNG**: download every slide as an image (great for PPT/Slides import).
 - **Presentation-safe sizing**: each slide is designed around **1080px of vertical space** (DOM height).
 
