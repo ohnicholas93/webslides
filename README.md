@@ -36,6 +36,7 @@ Slides live in `src/app/page.tsx`.
 
 - Each slide is a `<PresentationSlide title="..."> ... </PresentationSlide>`
 - Put static assets in `public/assets/` and reference them like `assets/my-image.png`
+- Update your logo / branding by replacing `public/assets/logo.png` with your own logo.
 - Keep content within the slide frame (vertical space is limited; overflow looks bad in exports)
 
 ### LaTeX / Math
@@ -79,3 +80,9 @@ Use the **Settings** button in the header to adjust:
 - `src/core/slide-exporter.tsx` — “Export” button logic
 - `public/assets/` — images used inside slides
 - `docs/assets/` — documentation screenshots / examples
+
+## Common Fixes
+
+- Ensure that Node.js is installed locally.
+- Ensure that NPM packages have been installed with `npm install`.
+- Ensure that all assets exist in the `public/assets/` directory and are referenced correctly.

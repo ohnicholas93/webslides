@@ -33,6 +33,7 @@ In your LLM chat, attach or paste **all** of the following:
   - `docs/assets/slide1.png`
   - `docs/assets/slide2.png`
   - `docs/assets/slide3.png`
+  - `docs/assets/slide4.png`
 - Your presentation material:
   - a short outline you write, and/or
   - a PDF, notes, paper, links, etc.
@@ -58,6 +59,8 @@ Hard constraints (must follow):
 - For math/LaTeX, use `Latex` from `@/components/latex` (supports `$...$`, `$$...$$`, `\\(...\\)`, `\\[...\\]`).
 - Keep typography and spacing presentation-friendly: readable at a distance, consistent hierarchy.
 - When adding images, assume they live in `public/assets/` and are referenced like `assets/<filename>`.
+- You may use figures, diagrams, images, tables, etc. provided from the reference content (if available). These do not come with captions.
+- Make sure to use the correct and appropriate theme class tokens.
 - Output ONLY the final TypeScript/TSX code for `src/app/page.tsx` (no explanations).
 - Tip: prefer `String.raw\`...\`` when embedding LaTeX so backslashes don’t need double-escaping.
 
@@ -90,9 +93,7 @@ Review every slide at `http://localhost:3000` and fix anything that looks crampe
 
 ## 6) Add/Update Assets
 
-If your generated slides reference images (for example `assets/diagram.png`), copy them into:
-
-- `public/assets/diagram.png`
+If your generated slides reference images, copy them into `public/assets/`. For example, if your generated slides reference `assets/diagram.png`, copy it to `public/assets/diagram.png`. Make sure to replace the logo / branding with your own at `public/assets/logo.png`.
 
 Then refresh the page and confirm all visuals load correctly.
 
