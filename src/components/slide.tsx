@@ -177,7 +177,12 @@ export default function PresentationSlide({
               </div>
               {!hideLogo && (
                 <div className="relative w-max z-50 overflow-visible justify-center items-center mr-0.5">
-                  <div className="absolute w-full h-[80%] top-[12.5%] scale-200 z-10 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,1)_0%,transparent_60%)]"></div>
+                  <div 
+                    className="absolute w-full h-[80%] top-[12.5%] scale-200 z-10"
+                    style={{
+                      background: `radial-gradient(ellipse at center, var(--${themeStyles.surfaceSoftBgClass.replace("bg-", "color-").split("/")[0]}) 0%, transparent 60%)`,
+                    }}  
+                  ></div>
                   <CustomImage
                     path="assets/logo.png"
                     className="w-max h-14 flex items-center justify-center text-[11px] tracking-[0.3em] uppercase border-0 relative z-50"

@@ -20,8 +20,22 @@ export const themes = {
       "figureCard flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm h-full w-full justify-center items-center overflow-hidden",
     iconBadgeClass:
       "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white border border-slate-100 shadow-sm text-slate-600",
+    iconBadgeStrongClass:
+      "flex p-3 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 border border-indigo-100 shadow-sm text-indigo-600",
     statCardClass:
       "flex flex-col justify-center p-6 rounded-2xl bg-white border border-slate-100 shadow-sm",
+    textBaseClass: "text-slate-800",
+    textStrongClass: "text-slate-900",
+    textMediumClass: "text-slate-700",
+    textSoftClass: "text-slate-600",
+    textMutedClass: "text-slate-500",
+    textFaintClass: "text-slate-400",
+    textAccentClass: "text-indigo-500",
+    textAccentStrongClass: "text-indigo-600",
+    textWarnClass: "text-rose-600",
+    textWarnStrongClass: "text-rose-500",
+    surfaceBgClass: "bg-white",
+    surfaceSoftBgClass: "bg-slate-50/50",
   },
   Mono: {
     slideClass:
@@ -44,8 +58,60 @@ export const themes = {
       "figureCard flex flex-col gap-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm h-full w-full justify-center items-center overflow-hidden",
     iconBadgeClass:
       "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white border border-slate-200 shadow-sm text-slate-700",
+    iconBadgeStrongClass:
+      "flex p-3 shrink-0 items-center justify-center rounded-2xl bg-slate-50 border border-slate-100 shadow-sm text-slate-600",
     statCardClass:
       "flex flex-col justify-center p-6 rounded-2xl bg-white border border-slate-200 shadow-sm",
+    textBaseClass: "text-slate-900",
+    textStrongClass: "text-slate-900",
+    textMediumClass: "text-slate-800",
+    textSoftClass: "text-slate-700",
+    textMutedClass: "text-slate-500",
+    textFaintClass: "text-slate-400",
+    textAccentClass: "text-slate-700",
+    textAccentStrongClass: "text-slate-800",
+    textWarnClass: "text-slate-800",
+    textWarnStrongClass: "text-slate-800",
+    surfaceBgClass: "bg-white",
+    surfaceSoftBgClass: "bg-slate-50/60",
+  },
+  Midnight: {
+    slideClass:
+      "bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100 shadow-[0_30px_120px_rgba(0,0,0,0.55)]",
+    slideBackgroundClass:
+      "before:absolute before:inset-10 before:rounded-[40px] before:border before:border-slate-800/80 before:pointer-events-none after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-gradient-to-br after:from-indigo-500/30 after:via-slate-950/10 after:to-fuchsia-400/20 after:blur-3xl after:opacity-80 after:pointer-events-none",
+    slideMetaTextClass: "text-slate-400",
+    slideMetaNumberClass: "text-slate-200",
+    chipClass:
+      "inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-950/40 px-4 py-1 text-sm font-medium text-slate-200 shadow-sm backdrop-blur",
+    cardClass:
+      "rounded-3xl border border-slate-800/70 bg-slate-950/40 p-8 shadow-[0_10px_40px_rgba(0,0,0,0.35)] backdrop-blur flex flex-col",
+    accentCardClass:
+      "rounded-3xl border border-indigo-900/50 bg-gradient-to-br from-indigo-950/40 via-slate-950/30 to-slate-950/30 p-8 shadow-[0_10px_40px_rgba(79,70,229,0.18)] backdrop-blur flex flex-col",
+    critiqueCardClass:
+      "rounded-3xl border-l-8 border-l-rose-400 border-y border-r border-y-rose-950/50 border-r-rose-950/50 bg-slate-950/40 p-8 shadow-[0_10px_40px_rgba(244,63,94,0.14)] backdrop-blur flex flex-col relative overflow-hidden",
+    softCardClass:
+      "rounded-3xl border border-slate-800/70 bg-slate-900/25 p-6 backdrop-blur",
+    figureCardClass:
+      "figureCard flex flex-col gap-6 rounded-3xl border border-slate-800/70 bg-slate-950/35 p-4 shadow-sm h-full w-full justify-center items-center overflow-hidden backdrop-blur",
+    iconBadgeClass:
+      "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-slate-950/40 border border-slate-800/70 shadow-sm text-slate-200 backdrop-blur",
+    iconBadgeStrongClass:
+      "flex p-3 shrink-0 items-center justify-center rounded-2xl bg-indigo-950 border border-indigo-800 shadow-sm text-indigo-200",
+    statCardClass:
+      "flex flex-col justify-center p-6 rounded-2xl bg-slate-950/35 border border-slate-800/70 shadow-sm backdrop-blur",
+    textBaseClass: "text-slate-100",
+    textStrongClass: "text-white",
+    textMediumClass: "text-slate-200",
+    textSoftClass: "text-slate-300",
+    textMutedClass: "text-slate-400",
+    textFaintClass: "text-slate-500",
+    textAccentClass: "text-indigo-300",
+    textAccentStrongClass: "text-indigo-200",
+    textWarnClass: "text-rose-300",
+    textWarnStrongClass: "text-rose-400",
+    surfaceBgClass: "bg-slate-600/75",
+    surfaceSoftBgClass: "bg-slate-700/30",
   },
   Custom: {
     slideClass:
@@ -68,8 +134,22 @@ export const themes = {
       "figureCard flex flex-col gap-6 rounded-3xl border border-[var(--slide-border)] bg-[var(--slide-card-bg)] p-4 shadow-sm h-full w-full justify-center items-center overflow-hidden",
     iconBadgeClass:
       "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--slide-card-bg)] border border-[var(--slide-border)] shadow-sm text-[var(--slide-muted)]",
+    iconBadgeStrongClass:
+      "flex p-3 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 border border-indigo-100 shadow-sm text-indigo-600",
     statCardClass:
       "flex flex-col justify-center p-6 rounded-2xl bg-[var(--slide-card-bg)] border border-[var(--slide-border)] shadow-sm",
+    textBaseClass: "text-[var(--slide-fg)]",
+    textStrongClass: "text-[var(--slide-fg)]",
+    textMediumClass: "text-[var(--slide-fg)]",
+    textSoftClass: "text-[var(--slide-muted)]",
+    textMutedClass: "text-[var(--slide-muted)]",
+    textFaintClass: "text-[var(--slide-muted)]",
+    textAccentClass: "text-[var(--slide-accent)]",
+    textAccentStrongClass: "text-[var(--slide-accent)]",
+    textWarnClass: "text-[var(--slide-warn)]",
+    textWarnStrongClass: "text-[var(--slide-warn)]",
+    surfaceBgClass: "bg-[var(--slide-card-bg)]",
+    surfaceSoftBgClass: "bg-[var(--slide-soft-bg)]",
   },
 } as const;
 
