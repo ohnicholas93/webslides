@@ -14,6 +14,7 @@ import {
 
 import CustomImage from "@/core/image";
 import PresentationSlide from "@/components/slide";
+import Latex from "@/components/latex";
 import { usePresentationSettings } from "@/core/presentation-settings";
 import { cn } from "@/lib/utils";
 import StageTimeline from "@/components/stage-timeline";
@@ -274,6 +275,81 @@ export default function Home() {
           </div>
         </PresentationSlide>
 
+        <PresentationSlide title="LaTeX (Math)">
+          <div className="flex flex-row items-start gap-6">
+            <div className="flex w-1/2 flex-col gap-6">
+              <div className={accentCardClass}>
+                <p className="text-sm font-bold uppercase tracking-[0.2em] text-indigo-500">
+                  Built-in math typesetting
+                </p>
+                <p className="mt-3 text-2xl font-semibold leading-snug text-slate-900">
+                  Write equations directly in your slides.
+                </p>
+                <p className="mt-3 text-lg leading-relaxed text-slate-700">
+                  Supports inline and display math via{" "}
+                  <span className="font-mono">$...$</span>,{" "}
+                  <span className="font-mono">$$...$$</span>,{" "}
+                  <span className="font-mono">\\(...\\)</span>, and{" "}
+                  <span className="font-mono">\\[...\\]</span>.
+                </p>
+              </div>
+              <div className="flex flex-col gap-6">
+              <div className={figureCardClass}>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  Matrices + notation
+                </p>
+                <Latex className="mt-4 whitespace-pre-wrap text-xl leading-relaxed text-slate-800">
+                  {String.raw`$$
+\mathbf{A}=
+\begin{bmatrix}
+1 & 2 \\
+3 & 4
+\end{bmatrix},
+\quad
+\det(\mathbf{A}) = -2
+$$`}
+                </Latex>
+              </div>
+
+              
+            </div>
+            </div>
+            <div className="flex flex-col gap-6">
+              <div className={cardClass}>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  Inline example
+                </p>
+                <Latex className="mt-3 text-xl leading-relaxed text-slate-800">
+                  {String.raw`Euler's identity: $e^{i\pi}+1=0$`}
+                </Latex>
+
+                <div className="mt-2 pt-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Display example
+                  </p>
+                  <Latex className="mt-3 whitespace-pre-wrap text-xl leading-relaxed text-slate-800">
+                    {String.raw`Gaussian integral:
+  $$\int_{-\infty}^{\infty} e^{-x^2}\,dx = \sqrt{\pi}$$`}
+                  </Latex>
+                </div>
+              </div>
+              <div className={softCardClass}>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                  Tip
+                </p>
+                <p className="mt-2 text-lg leading-relaxed text-slate-700">
+                  In TSX strings, remember to escape backslashes when needed
+                  (for example{" "}
+                  <span className="font-mono">{"\"\\\\alpha\""}</span>).
+                </p>
+              </div>
+            </div>
+            
+            
+          </div>
+          <StageTimeline activeStage={2} className="mt-auto" />
+        </PresentationSlide>
+
         <PresentationSlide title="Themes + Settings">
           <div className="flex h-full flex-col justify-center gap-6">
             <div className="grid grid-cols-3 gap-4">
@@ -367,4 +443,3 @@ export default function Home() {
     </main>
   );
 }
-

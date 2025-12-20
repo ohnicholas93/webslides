@@ -55,9 +55,11 @@ Hard constraints (must follow):
   - Do NOT overflow vertically. Overflow will look terrible in the export.
   - Prefer fewer words, tighter bullet lists, and multi-column layouts over long paragraphs.
 - Build slides using `<PresentationSlide title="..."> ... </PresentationSlide>` from the repo.
+- For math/LaTeX, use `Latex` from `@/components/latex` (supports `$...$`, `$$...$$`, `\\(...\\)`, `\\[...\\]`).
 - Keep typography and spacing presentation-friendly: readable at a distance, consistent hierarchy.
 - When adding images, assume they live in `public/assets/` and are referenced like `assets/<filename>`.
 - Output ONLY the final TypeScript/TSX code for `src/app/page.tsx` (no explanations).
+- Tip: prefer `String.raw\`...\`` when embedding LaTeX so backslashes don’t need double-escaping.
 
 My deck requirements:
 1) Audience: <describe the audience>

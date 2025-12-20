@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 
 import AppHeader from "@/core/app-header";
 import { PresentationSettingsProvider } from "@/core/presentation-settings";

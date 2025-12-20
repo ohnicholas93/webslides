@@ -185,7 +185,7 @@ export default function PresentationSlide({
                 </div>
               )}
             </div>
-            <div className="w-full z-50 flex-1 relative min-h-0">{children}</div>
+            <div className="w-full z-50 flex-1 relative min-h-0 flex flex-col">{children}</div>
             <div className="absolute inset-0 z-10">
               <div className={themeStyles.slideBackgroundClass}></div>
             </div>

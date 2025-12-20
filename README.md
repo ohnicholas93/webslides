@@ -38,6 +38,22 @@ Slides live in `src/app/page.tsx`.
 - Put static assets in `public/assets/` and reference them like `assets/my-image.png`
 - Keep content within the slide frame (vertical space is limited; overflow looks bad in exports)
 
+### LaTeX / Math
+
+Math typesetting is supported via KaTeX + a small helper component:
+
+- Use `Latex` from `src/components/latex.tsx`
+- Inline math: `$...$` or `\\(...\\)`
+- Display math: `$$...$$` or `\\[...\\]`
+
+Example:
+
+```tsx
+import Latex from "@/components/latex";
+
+<Latex>{String.raw`Euler: $e^{i\pi}+1=0$`}</Latex>
+```
+
 ## Exporting Slides (PNG)
 
 1. Run `npm run dev`
