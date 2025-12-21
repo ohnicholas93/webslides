@@ -3,6 +3,8 @@
 This project is designed so a multimodal LLM can draft an entire deck by generating a single file: `src/app/page.tsx`.
 You’ll provide the model with (1) the repo’s “shape” via Repomix, and (2) visual examples of what good slides look like using the sample images in `docs/assets/`.
 
+Given its excellent multimodal understanding, frontend generation, and long-context capabilities, Gemini 3 Pro (available for free through Google AI Studio) is highly recommended. Excellent empirical performance has been observed with Gemini 3 Pro in the WebSlides generation task.
+
 ## 1) Set Up the Repo Locally
 
 Prerequisites: install **Node.js** locally.
@@ -20,7 +22,7 @@ Open `http://localhost:3000` to preview the current deck.
 
 Open the Repomix link below and export/copy the generated XML:
 
-`https://repomix.com/?repo=ohnicholas93%2Fwebslides`
+[Repomix Link](https://repomix.com/?repo=ohnicholas93%2Fwebslides)
 
 Save it locally as something like `repomix.xml` (or keep it ready to paste into your LLM chat).
 
