@@ -12,7 +12,7 @@ export default function StageTimeline({ activeStage = 1, className }: { activeSt
   const baseNumberClass = `h-10 w-10 rounded-2xl bg-slate-200 flex items-center justify-center`
 
   return (
-    <div className={cn("mt-6 flex items-center gap-6 px-0.5", className)}>
+    <div className={cn("mt-6! flex items-center gap-6 px-0.5", className)}>
       <div className="flex items-center gap-3 text-sm font-semibold text-slate-500">
         <span className={cn(baseNumberClass, activeStage === 1 ? `${surfaceBgClass} ${textMediumClass}` : `${surfaceSoftBgClass} ${textMutedClass}`)}>1</span>
         <span>Problem</span>
