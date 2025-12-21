@@ -180,7 +180,17 @@ export default function Latex({
   delimiters = DEFAULT_DELIMITERS,
   katexOptions,
 }: LatexProps) {
-  const segments = tokenizeLatex(children, delimiters);
+  let segments = tokenizeLatex(children, delimiters);
+
+  // If no math segments were found, but the content looks like it might be
+  // intended as LaTeX (e.g., contains a backslash), treat the whole thing as math.
+  const hasMath = segments.some((s) => s.type === "math");
+  if (!hasMath && children.trim().length > 0) {
+    if (children.includes("\\") || children.includes("_") || children.includes("^") || children.includes("{")) {
+      segments = [{ type: "math", value: children, display: false }];
+    }
+  }
+  
   const Component = as;
 
   return (

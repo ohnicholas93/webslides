@@ -62,7 +62,9 @@ Hard constraints (must follow):
 - When adding images, assume they live in `public/assets/` and are referenced like `assets/<filename>`.
 - You may use figures, diagrams, images, tables, etc. provided from the reference content (if available). These do not come with captions.
 - Make sure to use the correct and appropriate theme class tokens.
-- For math/LaTeX, use `Latex` from `@/components/latex` (supports `$...$`, `$$...$$`, `\\(...\\)`, `\\[...\\]`).
+- For math/LaTeX, use `Latex` from `@/components/latex`. 
+  - **Mandatory**: Always wrap content in `{String.raw`...`}` (e.g., `<Latex>{String.raw`$E=mc^2$`}</Latex>`).
+  - **Mandatory**: Use explicit delimiters (`$ ... $` for inline, `$$ ... $$` for display) inside the `String.raw` block.
 - Tip: prefer `String.raw\`...\`` when embedding LaTeX so backslashes don’t need double-escaping.
 - Maintain TSX comments before each `<PresentationSlide>` to mark which slide number it is (for easier code navigation).
 - Output ONLY the final TypeScript/TSX code for `src/app/page.tsx` (no explanations).
