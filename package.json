@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "html-to-image": "^1.11.13",
+    "jspdf": "^4.2.1",
+    "jszip": "^3.10.1",
     "katex": "^0.16.9",
     "lucide-react": "^0.553.0",
     "next": "^16.0.3",
+    "pptxgenjs": "^4.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
@@ -26,5 +29,8 @@
     "eslint-config-next": "16.0.3",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "trustedDependencies": [
+    "unrs-resolver"
+  ]
 }
