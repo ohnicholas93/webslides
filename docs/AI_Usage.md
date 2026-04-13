@@ -79,9 +79,12 @@ My deck requirements:
 
 Slide sizing checklist (apply to every slide before finalizing):
 - No section should require scrolling.
+- Content tends to render MUCH bigger than you think, so minimize filler words and make sure there are NO REDUNDANT INFORMATION AT ALL. Use the space effectively and efficiently.
+- MAKE SURE IT IS NOT WORDY, and rather, it should be more VISUAL to convey the message. Sentences don't have to be full sentences. This is a slide deck!
 - Bullet lists should generally be <= 5–6 lines per column.
 - Headings should not wrap to 3+ lines.
 - Use whitespace intentionally; avoid cramming.
+- Do NOT use ANY font size smaller than text-xl. It must be >=text-xl.
 
 Now produce `src/app/page.tsx`.
 ```
