@@ -32,10 +32,10 @@ In your LLM chat, attach or paste **all** of the following:
 
 - The Repomix XML output (describes repo structure + key files)
 - The sample slide images:
-  - `docs/assets/slide1.png`
-  - `docs/assets/slide2.png`
-  - `docs/assets/slide3.png`
-  - `docs/assets/slide4.png`
+  - `docs/assets/slide-01.png`
+  - `docs/assets/slide-02.png`
+  - `docs/assets/slide-03.png`
+  - `docs/assets/slide-04.png`
 - Your presentation material:
   - a short outline you write, and/or
   - a PDF, notes, paper, links, etc.

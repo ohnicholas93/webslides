@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/slide1.png" alt="WebSlides preview slide" width="1000" />
+  <img src="docs/assets/slide-01.png" alt="WebSlides preview slide" width="1000" />
 </p>
 
 # WebSlides
