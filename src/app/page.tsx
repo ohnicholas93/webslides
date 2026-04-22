@@ -281,11 +281,16 @@ export default function Home() {
               </div>
 
               <div className={cardClass}>
-                <div className={cn(textMutedClass, "flex items-center gap-4")}>
+                <div className="flex items-center gap-4">
                   <div className={iconBadgeStrongClass}>
                     <CheckCircle2 className="h-6 w-6" />
                   </div>
-                  <p className="text-xl font-semibold uppercase tracking-[0.2em]">
+                  <p
+                    className={cn(
+                      textMutedClass,
+                      "text-xl font-semibold uppercase tracking-[0.2em]"
+                    )}
+                  >
                     Practical guidance
                   </p>
                 </div>
@@ -462,11 +467,16 @@ $$`}
         <PresentationSlide title="Themes + Settings">
           <div className="grid grid-cols-[1fr_1fr_1fr] gap-x-4 gap-y-6">
             <div className={cardClass}>
-              <div className={cn(textMutedClass, "flex items-center gap-4")}>
+              <div className="flex items-center gap-4">
                 <div className={iconBadgeStrongClass}>
                   <Palette className="h-6 w-6" />
                 </div>
-                <p className="text-xl font-semibold uppercase tracking-[0.2em]">
+                <p
+                  className={cn(
+                    textMutedClass,
+                    "text-xl font-semibold uppercase tracking-[0.2em]"
+                  )}
+                >
                   Theme Tokens
                 </p>
               </div>
@@ -493,11 +503,16 @@ $$`}
             </div>
 
             <div className={cardClass}>
-              <div className={cn(textMutedClass, "flex items-center gap-4")}>
+              <div className="flex items-center gap-4">
                 <div className={iconBadgeStrongClass}>
                   <Settings2 className="h-6 w-6" />
                 </div>
-                <p className="text-xl font-semibold uppercase tracking-[0.2em]">
+                <p
+                  className={cn(
+                    textMutedClass,
+                    "text-xl font-semibold uppercase tracking-[0.2em]"
+                  )}
+                >
                   Settings UI
                 </p>
               </div>
@@ -523,11 +538,16 @@ $$`}
             </div>
 
             <div className={cardClass}>
-              <div className={cn(textMutedClass, "flex items-center gap-4")}>
+              <div className="flex items-center gap-4">
                 <div className={iconBadgeStrongClass}>
                   <Download className="h-6 w-6" />
                 </div>
-                <p className="text-xl font-semibold uppercase tracking-[0.2em]">
+                <p
+                  className={cn(
+                    textMutedClass,
+                    "text-xl font-semibold uppercase tracking-[0.2em]"
+                  )}
+                >
                   Export Workflow
                 </p>
               </div>
