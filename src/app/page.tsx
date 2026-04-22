@@ -50,7 +50,7 @@ export default function Home() {
         {/* Slide 01 */}
         <PresentationSlide title="Demo Deck">
           <div className="grid grid-cols-[1fr_1fr_1.1fr] items-start gap-4">
-            <div className="col-span-2 mr-8 mt-8 flex flex-col gap-8">
+            <div className="col-span-2 flex flex-col gap-8 mt-8 mr-8">
               <div className="flex flex-wrap items-center gap-3">
                 <span className={cn(chipClass, "px-5 py-2 text-xl")}>
                   <Sparkles className="h-4 w-4" />
@@ -244,7 +244,7 @@ export default function Home() {
 
             <div className="flex flex-col gap-6">
               <div className={cn(accentCardClass, "relative overflow-hidden")}>
-                <div className="absolute -right-14 -bottom-14 opacity-5">
+                <div className="absolute -bottom-14 -right-14 opacity-5">
                   <BarChart3 className={cn(textAccentStrongClass, "h-80 w-80")} />
                 </div>
                 <p
@@ -268,7 +268,7 @@ export default function Home() {
                   export path designed to stay out of the way while you present.
                 </p>
 
-                <div className="mt-6 flex flex-wrap gap-3">
+                <div className="flex flex-wrap gap-3 mt-6">
                   <span className={cn(chipClass, "px-5 py-2 text-xl")}>
                     <Palette className="h-4 w-4" />
                     Theme styles
@@ -303,7 +303,7 @@ export default function Home() {
                   Keep each slide focused: one big idea, one strong visual, and a
                   small number of supporting facts.
                 </p>
-                <div className="mt-3 flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mt-3">
                   <div
                     className={cn(
                       surfaceBgClass,
@@ -371,7 +371,7 @@ export default function Home() {
               </div>
 
               <div>
-                <div className={cn(figureCardClass, "pt-8 gap-2")}>
+                <div className={cn(figureCardClass, "gap-2 pt-8")}>
                   <p
                     className={cn(
                       textFaintClass,
@@ -416,7 +416,7 @@ $$`}
                   {String.raw`Euler's identity: $e^{i\pi}+1=0$`}
                 </Latex>
 
-                <div className="mt-2 flex flex-col gap-2 pt-6">
+                <div className="flex flex-col gap-2 mt-2 pt-6">
                   <p
                     className={cn(
                       textFaintClass,
@@ -488,7 +488,7 @@ $$`}
               >
                 Visual language is derived from a small set of theme classes.
               </p>
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="flex flex-wrap gap-3 mt-5">
                 <span className={cn(chipClass, "px-5 py-2 text-xl")}>
                   cardClass
                 </span>
@@ -525,7 +525,7 @@ $$`}
                 Aspect ratio, resolution, theme, and safe auto-sizing are saved
                 in cookies.
               </p>
-              <div className={cn(textSoftClass, "mt-6 grid gap-4 text-xl")}>
+              <div className={cn(textSoftClass, "flex flex-col gap-4 mt-6 text-xl")}>
                 <div className="flex items-center justify-between">
                   <span className="font-mono">Aspect</span>
                   <span className="font-semibold">{settings.aspectRatio}</span>
@@ -559,7 +559,7 @@ $$`}
               >
                 Export walks the DOM and packages PNG, PDF, or PPTX output.
               </p>
-              <div className="mt-6 grid gap-2">
+              <div className="flex flex-col gap-2 mt-6">
                 <p
                   className={cn(
                     textFaintClass,
