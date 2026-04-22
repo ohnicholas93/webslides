@@ -22,7 +22,7 @@ export default function StageTimeline({
     <div
       className={cn(
         className,
-        "mt-auto flex items-center gap-6 px-0.5"
+        "mt-auto pt-8 flex items-center gap-6 px-0.5"
       )}
     >
       <div className={cn(textMutedClass, "flex items-center gap-3 text-xl font-semibold")}>

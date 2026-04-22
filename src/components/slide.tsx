@@ -54,12 +54,28 @@ export default function PresentationSlide({
     const node = containerRef.current;
     if (!node) return;
 
-    const update = () => setContainerWidth(node.getBoundingClientRect().width);
+    const update = () => {
+      const rect = node.getBoundingClientRect();
+      const viewportWidth =
+        window.visualViewport?.width ?? document.documentElement.clientWidth;
+      const visibleWidth =
+        Math.min(rect.right, viewportWidth) - Math.max(rect.left, 0);
+      const nextWidth =
+        visibleWidth > 0 ? visibleWidth : Math.min(rect.width, viewportWidth);
+
+      setContainerWidth(nextWidth);
+    };
     update();
 
     const observer = new ResizeObserver(() => update());
     observer.observe(node);
-    return () => observer.disconnect();
+    const visualViewport = window.visualViewport;
+    visualViewport?.addEventListener("resize", update);
+
+    return () => {
+      observer.disconnect();
+      visualViewport?.removeEventListener("resize", update);
+    };
   }, []);
 
   useEffect(() => {
@@ -129,7 +145,10 @@ export default function PresentationSlide({
   );
 
   return (
-    <div ref={containerRef} className="grid w-full justify-center">
+    <div
+      ref={containerRef}
+      className="grid w-full min-w-0 justify-self-stretch justify-center"
+    >
       <div
         className="relative"
         style={{ width: scaledSize.width, height: scaledSize.height }}
@@ -151,7 +170,7 @@ export default function PresentationSlide({
             }}
             className={cn(
               themeStyles.slideClass,
-              "relative grid overflow-hidden px-16 pt-10 pb-16",
+              "relative grid overflow-hidden px-14 pt-12 pb-12",
               "grid-rows-[auto_1fr]",
               className
             )}
