@@ -118,7 +118,7 @@ export default function SlideExporter({
   onExportComplete,
   variant = "page",
 }: SlideExporterProps) {
-  const { domSlideSize, exportPixelRatio } = usePresentationSettings();
+  const { domSlideSize, exportPixelRatio, themeStyles } = usePresentationSettings();
   const [activeExport, setActiveExport] = useState<ExportFormat | null>(null);
   const [toast, setToast] = useState<ExportToast>({
     message: "",
@@ -332,18 +332,24 @@ export default function SlideExporter({
 
   const buttonClassName =
     variant === "header"
-      ? "inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white/70 px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-white hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
-      : "w-full rounded-3xl bg-slate-900 px-6 py-4 text-xl font-semibold text-white shadow-xl transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 disabled:cursor-not-allowed disabled:opacity-60";
+      ? cn(
+          themeStyles.appControlClass,
+          "inline-grid min-h-10 place-items-center rounded-xl px-3 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        )
+      : cn(
+          themeStyles.appPrimaryButtonClass,
+          "grid w-full place-items-center rounded-3xl px-6 py-4 text-xl font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+        );
 
   const wrapperClassName =
     variant === "header"
-      ? "flex flex-col items-end gap-1"
+      ? "flex min-w-0 flex-1 flex-col items-end gap-1"
       : "w-full max-w-4xl text-center";
 
   const buttonsClassName =
     variant === "header"
       ? "flex flex-wrap items-center justify-end gap-2"
-      : "grid gap-3 md:grid-cols-3";
+      : "grid gap-3 md:grid-cols-[1fr_1fr_1fr]";
 
   const isToastVisible = toast.phase !== "hidden";
 
@@ -389,17 +395,15 @@ export default function SlideExporter({
         )}
       >
         <div
-          className={
-            cn(
-              "mx-auto flex min-h-10 w-fit max-w-full items-center justify-center rounded-full border px-5 py-2 text-sm font-medium shadow-[0_20px_60px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-all duration-250 ease-out",
-              toast.tone === "error"
-                ? "border-red-300/80 bg-red-50/95 text-red-700"
-                : "border-slate-200/80 bg-white/92 text-slate-700",
-              toast.phase === "visible" || toast.phase === "enter"
-                ? "scale-100"
-                : "scale-95"
-            )
-          }
+          className={cn(
+            toast.tone === "error"
+              ? themeStyles.appToastErrorClass
+              : themeStyles.appToastInfoClass,
+            "mx-auto grid min-h-10 w-fit max-w-full place-items-center rounded-full border px-5 py-2 text-sm font-medium shadow-[0_20px_60px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-all duration-250 ease-out",
+            toast.phase === "visible" || toast.phase === "enter"
+              ? "scale-100"
+              : "scale-95"
+          )}
         >
           {toast.message}
         </div>

@@ -37,9 +37,9 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PresentationSettingsProvider initialSettings={initialSettings}>
-          <div className="flex flex-col">
+          <div className="grid min-h-screen grid-rows-[auto_1fr]">
             <AppHeader />
-            <div className="flex-1 overflow-auto">{children}</div>
+            <div className="overflow-auto">{children}</div>
           </div>
         </PresentationSettingsProvider>
       </body>

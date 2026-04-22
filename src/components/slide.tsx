@@ -129,7 +129,7 @@ export default function PresentationSlide({
   );
 
   return (
-    <div ref={containerRef} className="w-full flex justify-center">
+    <div ref={containerRef} className="grid w-full justify-center">
       <div
         className="relative"
         style={{ width: scaledSize.width, height: scaledSize.height }}
@@ -150,23 +150,24 @@ export default function PresentationSlide({
               height: domSlideSize.height,
             }}
             className={cn(
-              "relative overflow-hidden px-16 pt-10 pb-16 flex flex-col",
               themeStyles.slideClass,
+              "relative grid overflow-hidden px-16 pt-10 pb-16",
+              "grid-rows-[auto_1fr]",
               className
             )}
           >
-            <div className="relative w-full z-50 flex flex-row justify-between mb-8 basis-0 shrink-0 grow-0 px-0.5">
+            <div className="relative z-50 mb-8 grid w-full grid-cols-[1fr_auto] items-start gap-6 px-0.5">
               <div
                 className={cn(
-                  "flex items-center gap-3 text-xl uppercase tracking-[0.35em]",
-                  themeStyles.slideMetaTextClass
+                  themeStyles.slideMetaTextClass,
+                  "flex items-center gap-3 text-xl uppercase tracking-[0.35em]"
                 )}
               >
                 {formattedNumber && title && (
                   <span
                     className={cn(
-                      "font-semibold tracking-[0.4em]",
-                      themeStyles.slideMetaNumberClass
+                      themeStyles.slideMetaNumberClass,
+                      "font-semibold tracking-[0.4em]"
                     )}
                   >
                     {formattedNumber}
@@ -176,21 +177,23 @@ export default function PresentationSlide({
                 <span>{title}</span>
               </div>
               {!hideLogo && (
-                <div className="relative w-max z-50 overflow-visible justify-center items-center mr-0.5">
-                  <div 
+                <div className="relative z-50 mr-0.5 grid w-max place-items-center overflow-visible">
+                  <div
                     className="absolute w-full h-[80%] top-[12.5%] scale-200 z-10"
                     style={{
-                      background: `radial-gradient(ellipse at center, var(--${themeStyles.surfaceSoftBgClass.replace("bg-", "color-").split("/")[0]}) 0%, transparent 60%)`,
-                    }}  
-                  ></div>
+                      background: `radial-gradient(ellipse at center, ${themeStyles.logoHaloColor} 0%, transparent 60%)`,
+                    }}
+                  />
                   <CustomImage
                     path="assets/logo.png"
-                    className="w-max h-14 flex items-center justify-center text-[11px] tracking-[0.3em] uppercase border-0 relative z-50"
+                    className="relative z-50 h-14 w-max border-0 text-[11px] uppercase tracking-[0.3em]"
                   />
                 </div>
               )}
             </div>
-            <div className="w-full z-50 flex-1 relative min-h-0 flex flex-col">{children}</div>
+            <div className="relative z-50 flex min-h-0 w-full flex-1 flex-col">
+              {children}
+            </div>
             <div className="absolute inset-0 z-10">
               <div className={themeStyles.slideBackgroundClass}></div>
             </div>

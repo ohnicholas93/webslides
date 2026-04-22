@@ -12,15 +12,20 @@ export default function StageTimeline({
     textMediumClass,
     textMutedClass,
     surfaceBgClass,
-    surfaceSoftBgClass,
+    surfaceSoftBgClass
   } = usePresentationSettings().themeStyles;
 
   const baseNumberClass =
-    "h-10 w-10 rounded-2xl flex items-center justify-center text-xl font-semibold";
+    "grid h-10 w-10 place-items-center rounded-2xl text-xl font-semibold";
 
   return (
-    <div className={cn("mt-auto! flex items-center gap-6 px-0.5", className)}>
-      <div className={cn("flex items-center gap-3 text-xl font-semibold", textMutedClass)}>
+    <div
+      className={cn(
+        className,
+        "mt-auto flex items-center gap-6 px-0.5"
+      )}
+    >
+      <div className={cn(textMutedClass, "flex items-center gap-3 text-xl font-semibold")}>
         <span
           className={cn(
             baseNumberClass,
@@ -33,8 +38,8 @@ export default function StageTimeline({
         </span>
         <span>Problem</span>
       </div>
-      <div className={cn("h-px flex-1 opacity-70", surfaceSoftBgClass)} />
-      <div className={cn("flex items-center gap-3 text-xl font-semibold", textMutedClass)}>
+      <div className={cn(textMutedClass, "h-px flex-1 bg-current opacity-20")} />
+      <div className={cn(textMutedClass, "flex items-center gap-3 text-xl font-semibold")}>
         <span
           className={cn(
             baseNumberClass,
@@ -47,8 +52,8 @@ export default function StageTimeline({
         </span>
         <span>Method</span>
       </div>
-      <div className={cn("h-px flex-1 opacity-70", surfaceSoftBgClass)} />
-      <div className={cn("flex items-center gap-3 text-xl font-semibold", textMutedClass)}>
+      <div className={cn(textMutedClass, "h-px flex-1 bg-current opacity-20")} />
+      <div className={cn(textMutedClass, "flex items-center gap-3 text-xl font-semibold")}>
         <span
           className={cn(
             baseNumberClass,
