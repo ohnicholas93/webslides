@@ -3,7 +3,7 @@ export const themes = {
     slideClass:
       "bg-gradient-to-br from-white via-[#f6f7ff] to-[#e7edff] text-slate-800 shadow-[0_30px_120px_rgba(15,23,66,0.15)]",
     slideBackgroundClass:
-      "before:absolute before:inset-10 before:rounded-[40px] before:border before:border-slate-200/80 before:pointer-events-none after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-gradient-to-br after:from-[#a6b8ff] after:via-[#f3f8ff] after:to-[#ffe6f2] after:blur-3xl after:opacity-70 after:pointer-events-none",
+      "after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-gradient-to-br after:from-[#a6b8ff] after:via-[#f3f8ff] after:to-[#ffe6f2] after:blur-3xl after:opacity-70 after:pointer-events-none",
     slideMetaTextClass: "text-slate-500",
     slideMetaNumberClass: "text-slate-700",
     chipClass:
@@ -41,7 +41,7 @@ export const themes = {
     slideClass:
       "bg-gradient-to-br from-white via-slate-50 to-slate-100 text-slate-900 shadow-[0_30px_120px_rgba(15,23,42,0.16)]",
     slideBackgroundClass:
-      "before:absolute before:inset-10 before:rounded-[40px] before:border before:border-slate-200/80 before:pointer-events-none after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-gradient-to-br after:from-slate-200 after:via-white after:to-slate-300 after:blur-3xl after:opacity-80 after:pointer-events-none",
+      "after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-gradient-to-br after:from-slate-200 after:via-white after:to-slate-300 after:blur-3xl after:opacity-80 after:pointer-events-none",
     slideMetaTextClass: "text-slate-500",
     slideMetaNumberClass: "text-slate-800",
     chipClass:
@@ -79,7 +79,7 @@ export const themes = {
     slideClass:
       "bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100 shadow-[0_30px_120px_rgba(0,0,0,0.55)]",
     slideBackgroundClass:
-      "before:absolute before:inset-10 before:rounded-[40px] before:border before:border-slate-800/80 before:pointer-events-none after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-gradient-to-br after:from-indigo-500/30 after:via-slate-950/10 after:to-fuchsia-400/20 after:blur-3xl after:opacity-80 after:pointer-events-none",
+      "after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-gradient-to-br after:from-indigo-500/30 after:via-slate-950/10 after:to-fuchsia-400/20 after:blur-3xl after:opacity-80 after:pointer-events-none",
     slideMetaTextClass: "text-slate-400",
     slideMetaNumberClass: "text-slate-200",
     chipClass:
@@ -117,7 +117,7 @@ export const themes = {
     slideClass:
       "bg-[var(--slide-bg)] text-[var(--slide-fg)] shadow-[0_30px_120px_rgba(0,0,0,0.25)]",
     slideBackgroundClass:
-      "before:absolute before:inset-10 before:rounded-[40px] before:border before:border-[var(--slide-border)] before:pointer-events-none after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-[radial-gradient(ellipse_at_center,var(--slide-accent)_0%,transparent_65%)] after:blur-3xl after:opacity-70 after:pointer-events-none",
+      "after:absolute after:-right-24 after:-top-24 after:h-72 after:w-72 after:rounded-full after:bg-[radial-gradient(ellipse_at_center,var(--slide-accent)_0%,transparent_65%)] after:blur-3xl after:opacity-70 after:pointer-events-none",
     slideMetaTextClass: "text-[var(--slide-muted)]",
     slideMetaNumberClass: "text-[var(--slide-fg)]",
     chipClass:
@@ -135,7 +135,7 @@ export const themes = {
     iconBadgeClass:
       "flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--slide-card-bg)] border border-[var(--slide-border)] shadow-sm text-[var(--slide-muted)]",
     iconBadgeStrongClass:
-      "flex p-3 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 border border-indigo-100 shadow-sm text-indigo-600",
+      "flex p-3 shrink-0 items-center justify-center rounded-2xl bg-[var(--slide-accent-bg)] border border-[var(--slide-border)] shadow-sm text-[var(--slide-accent)]",
     statCardClass:
       "flex flex-col justify-center p-6 rounded-2xl bg-[var(--slide-card-bg)] border border-[var(--slide-border)] shadow-sm",
     textBaseClass: "text-[var(--slide-fg)]",

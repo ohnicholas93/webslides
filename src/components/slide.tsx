@@ -150,15 +150,15 @@ export default function PresentationSlide({
               height: domSlideSize.height,
             }}
             className={cn(
-              "relative overflow-hidden px-20 pt-14 pb-16 flex flex-col",
+              "relative overflow-hidden px-16 pt-10 pb-16 flex flex-col",
               themeStyles.slideClass,
               className
             )}
           >
-            <div className="relative w-full z-50 flex flex-row justify-between mb-4 basis-0 shrink-0 grow-0 px-0.5">
+            <div className="relative w-full z-50 flex flex-row justify-between mb-8 basis-0 shrink-0 grow-0 px-0.5">
               <div
                 className={cn(
-                  "flex items-center gap-3 text-sm uppercase tracking-[0.5em]",
+                  "flex items-center gap-3 text-xl uppercase tracking-[0.35em]",
                   themeStyles.slideMetaTextClass
                 )}
               >

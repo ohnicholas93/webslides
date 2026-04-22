@@ -40,3 +40,7 @@ body {
   border: none;
   border-radius: 0;
 }
+
+span.katex-display {
+  margin: 0em 0;
+}
