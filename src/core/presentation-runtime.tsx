@@ -8,7 +8,9 @@ import {
   Clock3,
   CircleSlash2,
   FileJson,
+  Fingerprint,
   LayoutPanelLeft,
+  Link2,
   Maximize2,
   PanelRightOpen,
   PlugZap,
@@ -447,7 +449,6 @@ function MetadataModal({
   slides,
   metadata,
   sessionId,
-  clientId,
   wsUrl,
   connectionState,
   notesSyncState,
@@ -460,7 +461,6 @@ function MetadataModal({
   slides: SlideSnapshot[];
   metadata: PresentationMetadata;
   sessionId: string;
-  clientId: string;
   wsUrl: string;
   connectionState: ConnectionState;
   notesSyncState: NotesSyncState;
@@ -470,6 +470,44 @@ function MetadataModal({
   onWsUrlChange: (value: string) => void;
 }) {
   if (!open) return null;
+
+  const statusMeta =
+    notesSyncState === "error"
+      ? {
+          detail: "Notes could not bewritten",
+          tone: "border-rose-200 bg-rose-50 text-rose-700",
+          icon: CircleSlash2,
+        }
+      : notesSyncState === "saving"
+        ? {
+            detail: "Writing to disk...",
+            tone: "border-amber-200 bg-amber-50 text-amber-700",
+            icon: Clock3,
+          }
+        : notesSyncState === "loading"
+          ? {
+              detail: "Reading from disk...",
+              tone: "border-slate-200 bg-slate-100 text-slate-600",
+              icon: Clock3,
+            }
+          : connectionState === "connected"
+            ? {
+                detail: "Sync available",
+                tone: "border-emerald-200 bg-emerald-50 text-emerald-700",
+                icon: PlugZap,
+              }
+            : connectionState === "connecting"
+              ? {
+                  detail: "Starting sync...",
+                  tone: "border-amber-200 bg-amber-50 text-amber-700",
+                  icon: Clock3,
+                }
+              : {
+                  detail: "Notes still saved",
+                  tone: "border-slate-200 bg-slate-100 text-slate-600",
+                  icon: CircleSlash2,
+                };
+  const StatusIcon = statusMeta.icon;
 
   return createPortal(
     <div className="fixed inset-0 z-[900] grid justify-items-center overflow-y-auto bg-slate-950/40 px-4 py-6">
@@ -491,50 +529,56 @@ function MetadataModal({
         </div>
 
         <div className="grid min-h-0 grid-cols-[280px_minmax(0,1fr)] gap-4 overflow-hidden p-4">
-          <div className="flex min-h-0 flex-col gap-4">
-            <label className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <span className="text-sm font-medium text-slate-600">
-                Session ID
-              </span>
-              <input
-                value={sessionId}
-                onChange={(event) => onSessionIdChange(event.target.value)}
-                className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 outline-none focus:border-slate-500"
-              />
-            </label>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm font-medium text-slate-600">Client ID</p>
-              <p className="mt-2 break-all font-mono text-sm text-slate-900">
-                {clientId}
-              </p>
-            </div>
-            <label className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <span className="text-sm font-medium text-slate-600">
-                WebSocket URL
-              </span>
-              <input
-                value={wsUrl}
-                onChange={(event) => onWsUrlChange(event.target.value)}
-                className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 outline-none focus:border-slate-500"
-              />
-            </label>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              Status:{" "}
-              <span className="font-semibold text-slate-950">
-                {connectionState}
-              </span>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              <p className="text-sm font-medium text-slate-600">Notes file</p>
-              <p className="mt-2 font-mono text-sm text-slate-900">
-                public/notes.json
-              </p>
-              <p className="mt-2">
-                Sync:{" "}
-                <span className="font-semibold text-slate-950">
-                  {notesSyncState}
+          <div className="min-h-0">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/80">
+              <label className="grid gap-3 border-b border-slate-200 bg-white p-4">
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-blue-100 bg-blue-50 text-blue-600">
+                    <Fingerprint className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0 text-sm font-semibold text-slate-900">
+                    Session ID
+                  </span>
                 </span>
-              </p>
+                <input
+                  value={sessionId}
+                  onChange={(event) => onSessionIdChange(event.target.value)}
+                  className="min-w-0 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                />
+              </label>
+
+              <label className="grid gap-3 border-b border-slate-200 bg-white p-4">
+                <span className="flex min-w-0 items-center gap-3">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-slate-200 bg-slate-50 text-slate-700">
+                    <Link2 className="h-4 w-4" />
+                  </span>
+                  <span className="min-w-0 text-sm font-semibold text-slate-900">
+                    WebSocket URL
+                  </span>
+                </span>
+                <input
+                  value={wsUrl}
+                  onChange={(event) => onWsUrlChange(event.target.value)}
+                  className="min-w-0 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 font-mono text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                />
+              </label>
+
+              <div className="grid gap-3 bg-white p-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <span
+                    className={cn(
+                      "grid h-9 w-9 shrink-0 place-items-center rounded-lg border",
+                      statusMeta.tone
+                    )}
+                  >
+                    <StatusIcon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-slate-900">Status</p>
+                    <p className="text-xs text-slate-500">{statusMeta.detail}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1078,7 +1122,6 @@ export default function PresentationRuntimeControls() {
         slides={slides}
         metadata={metadata}
         sessionId={sessionId}
-        clientId={clientId}
         wsUrl={wsUrl}
         connectionState={connectionState}
         notesSyncState={notesSyncState}
