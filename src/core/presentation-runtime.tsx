@@ -289,10 +289,10 @@ function PresentationOverlay({
   const seconds = String(elapsedSeconds % 60).padStart(2, "0");
   const connectionLabel =
     connectionState === "connected"
-      ? "WS live"
+      ? "Connected"
       : connectionState === "connecting"
-        ? "WS connecting"
-        : "WS offline";
+        ? "Connecting"
+        : "Disconnected";
 
   if (isPresent) {
     return createPortal(

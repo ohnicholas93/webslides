@@ -88,7 +88,7 @@ function Rule({
       <p className="text-2xl font-bold uppercase tracking-widest text-[#7dd3fc]">
         {label}
       </p>
-      <p className="text-2xl font-semibold leading-snug text-white">
+      <p className="text-2xl leading-snug text-white">
         {children}
       </p>
     </div>
@@ -223,7 +223,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-7 self-start pt-2">
+            <div className="grid grid-cols-2 gap-7 self-start">
               <Capability
                 icon={Layers3}
                 title="Slide boundary"
@@ -232,7 +232,7 @@ export default function Home() {
               <Capability
                 icon={Download}
                 title="Export path"
-                body="PNG, PDF, and PPTX exports the DOM at deterministic slide dimensions."
+                body="PNG, PDF, and PPTX export at deterministic slide dimensions."
               />
               <Capability
                 icon={MonitorPlay}
