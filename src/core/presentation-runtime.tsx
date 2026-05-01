@@ -198,15 +198,15 @@ function PresentationOverlay({
 }) {
   const { domSlideSize } = usePresentationSettings();
   const [viewport, setViewport] = useState({ width: 1280, height: 720 });
-  const [sidebarWidth, setSidebarWidth] = useState(308);
+  const [sidebarWidth, setSidebarWidth] = useState(460);
   const sidebarDragStateRef = useRef<{
     startX: number;
     startWidth: number;
   } | null>(null);
   const isPresenter = mode === "presenter";
   const isPresent = mode === "present";
-  const minSidebarWidth = 260;
-  const maxSidebarWidth = Math.min(420, Math.max(300, viewport.width - 520));
+  const minSidebarWidth = 320;
+  const maxSidebarWidth = Math.max(420, Math.min(viewport.width * 0.75, viewport.width - 160));
   const presenterSidebarWidth = Math.min(
     maxSidebarWidth,
     Math.max(minSidebarWidth, sidebarWidth)
@@ -280,13 +280,11 @@ function PresentationOverlay({
     slideIndex + 1 < slides.length ? slides[slideIndex + 1] : undefined;
   const slideNumber = slideIndex + 1;
   const presenterScale = Math.min(
-    1,
     Math.max(320, viewport.width - presenterSidebarWidth - 33) /
       domSlideSize.width,
     Math.max(320, viewport.height - 132) / domSlideSize.height
   );
   const presentScale = Math.min(
-    1,
     Math.max(320, viewport.width) / domSlideSize.width,
     Math.max(320, viewport.height) / domSlideSize.height
   );

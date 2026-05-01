@@ -121,7 +121,7 @@ export default function PresentationSlide({
 
       const heightScale = availableHeight / domSlideSize.height;
       const widthScale = availableWidth / domSlideSize.width;
-      const nextScale = Math.min(1, heightScale, widthScale);
+      const nextScale = Math.min(heightScale, widthScale);
 
       setViewportScale(
         Number.isFinite(nextScale) && nextScale > 0 ? nextScale : 1
