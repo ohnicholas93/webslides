@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 
 import { usePresentationSettings } from "@/core/presentation-settings";
-import { themes, type ThemeName } from "@/components/slide-styles";
 import { cn } from "@/lib/utils";
 import {
   aspectRatioOptions,
@@ -28,11 +27,8 @@ export default function SettingsModal({
     settings,
     setAspectRatio,
     setResolution,
-    setTheme,
     setSafeAutoSizing,
-    themeStyles,
-  } =
-    usePresentationSettings();
+  } = usePresentationSettings();
 
   const exportSize = useMemo(() => getExportSlideSize(settings), [settings]);
 
@@ -53,10 +49,6 @@ export default function SettingsModal({
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onOpenChange, open]);
-
-  const themeOptions = useMemo(() => {
-    return Object.keys(themes) as ThemeName[];
-  }, []);
 
   useEffect(() => {
     if (open) {
@@ -93,8 +85,7 @@ export default function SettingsModal({
         type="button"
         aria-label="Close settings"
         className={cn(
-          themeStyles.appModalBackdropClass,
-          "absolute inset-0 backdrop-blur-sm transition-opacity duration-200",
+          "absolute inset-0 bg-slate-950/40 backdrop-blur-sm transition-opacity duration-200",
           visible ? "opacity-100" : "opacity-0"
         )}
         onClick={() => onOpenChange(false)}
@@ -102,27 +93,23 @@ export default function SettingsModal({
 
       <div
         className={cn(
-          themeStyles.appModalClass,
-          "relative grid w-full max-w-lg grid-cols-[1fr] gap-6 rounded-3xl p-6 transition duration-200 ease-out",
+          "relative grid w-full max-w-lg grid-cols-[1fr] gap-6 rounded-3xl border border-slate-200 bg-white p-6 text-slate-950 shadow-2xl transition duration-200 ease-out",
           visible ? "translate-y-0 scale-100 opacity-100" : "translate-y-2 scale-[0.99] opacity-0"
         )}
       >
         <div className="flex items-start justify-between gap-4">
           <div className="grid grid-cols-[1fr] gap-1">
-            <h2 className={cn(themeStyles.textStrongClass, "text-lg font-semibold")}>
+            <h2 className="text-lg font-semibold text-slate-950">
               Settings
             </h2>
-            <p className={cn(themeStyles.textMutedClass, "text-sm")}>
+            <p className="text-sm text-slate-500">
               Saved automatically in cookies.
             </p>
           </div>
           <button
             type="button"
             onClick={() => onOpenChange(false)}
-            className={cn(
-              themeStyles.appControlClass,
-              "inline-grid h-9 w-9 place-items-center rounded-xl transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-            )}
+            className="inline-grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
             aria-label="Close"
           >
             <X className="h-4 w-4" />
@@ -131,7 +118,7 @@ export default function SettingsModal({
 
         <div className="grid grid-cols-[1fr] gap-5">
           <div className="grid grid-cols-[1fr] gap-2">
-            <label className={cn(themeStyles.textStrongClass, "text-sm font-medium")}>
+            <label className="text-sm font-medium text-slate-900">
               Aspect Ratio
             </label>
             <div className="relative grid grid-cols-[1fr]">
@@ -140,10 +127,7 @@ export default function SettingsModal({
                 onChange={(e) =>
                   setAspectRatio(e.target.value as AspectRatioKey)
                 }
-                className={cn(
-                  themeStyles.appInputClass,
-                  "w-full appearance-none rounded-2xl px-4 py-3 pr-12 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                )}
+                className="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-950 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
               >
                 {aspectRatioOptions.map((option) => (
                   <option key={option.key} value={option.key}>
@@ -152,26 +136,20 @@ export default function SettingsModal({
                 ))}
               </select>
               <ChevronDown
-                className={cn(
-                  themeStyles.appInputIconClass,
-                  "pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2"
-                )}
+                className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-slate-500"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-[1fr] gap-2">
-            <label className={cn(themeStyles.textStrongClass, "text-sm font-medium")}>
+            <label className="text-sm font-medium text-slate-900">
               Resolution
             </label>
             <div className="relative grid grid-cols-[1fr]">
               <select
                 value={settings.resolution}
                 onChange={(e) => setResolution(e.target.value as ResolutionKey)}
-                className={cn(
-                  themeStyles.appInputClass,
-                  "w-full appearance-none rounded-2xl px-4 py-3 pr-12 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                )}
+                className="w-full appearance-none rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-12 text-sm text-slate-950 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
               >
                 {resolutionOptions.map((option) => (
                   <option key={option.key} value={option.key}>
@@ -180,56 +158,22 @@ export default function SettingsModal({
                 ))}
               </select>
               <ChevronDown
-                className={cn(
-                  themeStyles.appInputIconClass,
-                  "pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2"
-                )}
+                className="pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2 text-slate-500"
               />
             </div>
-            <p className={cn(themeStyles.textMutedClass, "text-xs")}>
+            <p className="text-xs text-slate-500">
               Export size: {exportSize.width} × {exportSize.height}
             </p>
           </div>
 
-          <div className="grid grid-cols-[1fr] gap-2">
-            <label className={cn(themeStyles.textStrongClass, "text-sm font-medium")}>
-              Theme
-            </label>
-            <div className="relative grid grid-cols-[1fr]">
-              <select
-                value={settings.theme}
-                onChange={(e) => setTheme(e.target.value as ThemeName)}
-                className={cn(
-                  themeStyles.appInputClass,
-                  "w-full appearance-none rounded-2xl px-4 py-3 pr-12 text-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                )}
-              >
-                {themeOptions.map((name) => (
-                  <option key={name} value={name}>
-                    {name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className={cn(
-                  themeStyles.appInputIconClass,
-                  "pointer-events-none absolute top-1/2 right-4 h-4 w-4 -translate-y-1/2"
-                )}
-              />
-            </div>
-          </div>
-
           <div
-            className={cn(
-              themeStyles.appPanelClass,
-              "flex items-center justify-between gap-6 rounded-2xl px-4 py-3"
-            )}
+            className="flex items-center justify-between gap-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3"
           >
             <div className="grid grid-cols-[1fr] gap-0.5">
-              <p className={cn(themeStyles.textStrongClass, "text-sm font-medium")}>
+              <p className="text-sm font-medium text-slate-900">
                 Safe Auto Sizing
               </p>
-              <p className={cn(themeStyles.textMutedClass, "text-xs")}>
+              <p className="text-xs text-slate-500">
                 Auto-fit slides to the viewport.
               </p>
             </div>
@@ -239,7 +183,7 @@ export default function SettingsModal({
                 type="checkbox"
                 checked={settings.safeAutoSizing}
                 onChange={(e) => setSafeAutoSizing(e.target.checked)}
-                className={cn(themeStyles.appCheckboxClass, "h-5 w-5 rounded")}
+                className="h-5 w-5 rounded border-slate-300 text-cyan-700"
               />
             </label>
           </div>

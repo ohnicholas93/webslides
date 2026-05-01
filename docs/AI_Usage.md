@@ -1,19 +1,33 @@
-# AI Usage: Generate a Deck (and Export to PowerPoint)
+# AI Usage: Generate a Deck
 
 This project is designed so a multimodal LLM can draft an entire deck by generating a single file: `src/app/page.tsx`.
-You’ll provide the model with (1) the repo’s “shape” via Repomix, and (2) visual examples of what good slides look like using the sample images in `docs/assets/`.
+You’ll provide the model with the repo’s shape via Repomix, reference material for the talk, and any visual direction you want the deck to follow.
 
 Given its excellent multimodal understanding, frontend generation, and long-context capabilities, Gemini 3 Pro (available for free through Google AI Studio) is highly recommended. Excellent empirical performance has been observed with Gemini 3 Pro in the WebSlides generation task.
 
+## Authoring Philosophy
+
+WebSlides should give the model strong structural constraints without forcing a house theme.
+
+The model should keep the deck export-safe and readable, but it may define a fresh visual language for each deck, section, or slide. It can create local helper components, class constants, data arrays, SVG diagrams, CSS-driven visuals, and reusable layout primitives inside `src/app/page.tsx` when they improve clarity or reduce duplication. Do not require a global `deckStyle` object or repo-level theme system.
+
+Good generated decks should:
+
+- Use `PresentationSlide` as the slide boundary and preserve export/runtime behavior.
+- Be visually specific to the content instead of copying a fixed template.
+- Reuse local components/classes when patterns repeat, but allow one-off slide treatments when they communicate better.
+- Keep layout predictable enough for a live presentation: clear hierarchy, readable type, no clipped content.
+- Keep important content visible in the final exported state.
+
 ## 1) Set Up the Repo Locally
 
-Prerequisites: install **Node.js** locally.
+Prerequisites: install **Bun** locally.
 
 ```bash
 git clone https://github.com/ohnicholas93/webslides.git
 cd webslides
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 Open `http://localhost:3000` to preview the current deck.
@@ -31,7 +45,7 @@ Save it locally as something like `repomix.xml` (or keep it ready to paste into 
 In your LLM chat, attach or paste **all** of the following:
 
 - The Repomix XML output (describes repo structure + key files)
-- The sample slide images:
+- Optional sample slide images:
   - `docs/assets/slide-01.png`
   - `docs/assets/slide-02.png`
   - `docs/assets/slide-03.png`
@@ -39,8 +53,10 @@ In your LLM chat, attach or paste **all** of the following:
 - Your presentation material:
   - a short outline you write, and/or
   - a PDF, notes, paper, links, etc.
+- Visual direction, if any:
+  - brand colors, logo, audience, venue, tone, visual references, or “create a new style from the content”
 
-These images matter: they show the “house style” and how the base template renders.
+Sample images are useful for understanding scale and rendering behavior. They are not a required house style.
 
 ## 4) Use This Prompt (Copy/Paste)
 
@@ -51,7 +67,7 @@ You are helping me generate slides for the WebSlides repo (Next.js + React + Tai
 
 Goal:
 - Generate a complete replacement for `src/app/page.tsx` that renders my deck using the existing components in the repo.
-- Use the visual style of the provided sample slides (I attached slide screenshots) as the reference for how the base template renders.
+- Create a bespoke visual style for this deck based on the topic, audience, and source material. Do not rely on a fixed house theme unless I explicitly ask for one.
 
 Hard constraints (must follow):
 - Each slide has only 1080px of vertical height real estate in the DOM.
@@ -61,7 +77,10 @@ Hard constraints (must follow):
 - Keep typography and spacing presentation-friendly: readable at a distance, consistent hierarchy.
 - When adding images, assume they live in `public/assets/` and are referenced like `assets/<filename>`.
 - You may use figures, diagrams, images, tables, etc. provided from the reference content (if available). These do not come with captions.
-- Make sure to use the correct and appropriate theme class tokens.
+- You may define any reusable helper components, class constants, data structures, SVG diagrams, or layout primitives inside `src/app/page.tsx`.
+- Prefer reuse where it reduces duplication or creates coherence, but do not force a global theme object. Each slide may have a distinct visual treatment when that better communicates the content.
+- Use Tailwind classes directly. Do not depend on repo-level themes for slide content.
+- Keep all important content visible in the final exported slide state. Do not use auto-playing carousels, looping hidden-content animations, marquees, or timing-dependent content as the primary way to communicate information.
 - For math/LaTeX, use `Latex` from `@/components/latex`. 
   - **Mandatory**: Always wrap content in `{String.raw`...`}` (e.g., `<Latex>{String.raw`$E=mc^2$`}</Latex>`).
   - **Mandatory**: Use explicit delimiters (`$ ... $` for inline, `$$ ... $$` for display) inside the `String.raw` block.
@@ -76,6 +95,8 @@ My deck requirements:
 4) Tone: <e.g., academic / startup / internal tech talk>
 5) Content to include (outline + key points):
 <paste your outline OR say “see attached PDF” and summarize what to cover>
+6) Visual direction:
+<optional: describe brand, references, mood, or say “create a new visual style from the content”>
 
 Slide sizing checklist (apply to every slide before finalizing):
 - No section should require scrolling.
@@ -94,7 +115,7 @@ Now produce `src/app/page.tsx`.
 Replace your local `src/app/page.tsx` with the model output, then run:
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 Review every slide at `http://localhost:3000` and fix anything that looks cramped or clipped.
@@ -113,7 +134,6 @@ Then refresh the page and confirm all visuals load correctly.
 
 Tip: If a slide looks “too dense” after export, reduce text, increase spacing, or split it into two slides. You can describe any required changes with an AI Editor like Cursor.
 
-## Dark Mode Note
+## Style Note
 
-Dark mode is supported, but you’ll typically want to build a **custom theme** (so backgrounds, cards, and accent colors stay consistent).
-An AI can generate that theme as well—ask it to create/update the theme tokens/styles used by the repo’s slide components—and make sure your typography colors are adjusted for contrast and readability.
+WebSlides does not provide built-in slide themes. New generated slide decks should define their own visuals in `src/app/page.tsx`, using local components and class constants only where they help the deck stay coherent and maintainable.

@@ -484,7 +484,6 @@ function MetadataModal({
 }
 
 export default function PresentationRuntimeControls() {
-  const { themeStyles } = usePresentationSettings();
   const [mode, setModeState] = useState<RuntimeMode>(() => {
     if (typeof window === "undefined") return null;
     const view = new URLSearchParams(window.location.search).get("webslidesView");
@@ -767,10 +766,7 @@ export default function PresentationRuntimeControls() {
       <button
         type="button"
         onClick={() => setMode("present")}
-        className={cn(
-          themeStyles.appControlClass,
-          "inline-flex h-10 items-center gap-2 rounded-xl px-3 text-xl font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        )}
+        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xl font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
         <Maximize2 className="h-5 w-5" />
         Present
@@ -778,10 +774,7 @@ export default function PresentationRuntimeControls() {
       <button
         type="button"
         onClick={openPresenterView}
-        className={cn(
-          themeStyles.appControlClass,
-          "inline-flex h-10 items-center gap-2 rounded-xl px-3 text-xl font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        )}
+        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xl font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
         <PanelRightOpen className="h-5 w-5" />
         Presenter
@@ -789,10 +782,7 @@ export default function PresentationRuntimeControls() {
       <button
         type="button"
         onClick={() => setIsMetadataOpen(true)}
-        className={cn(
-          themeStyles.appControlClass,
-          "inline-grid h-10 w-10 place-items-center rounded-xl p-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-        )}
+        className="inline-grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
         aria-label="Open presentation metadata"
       >
         <FileJson className="h-5 w-5" />

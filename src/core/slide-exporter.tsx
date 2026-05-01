@@ -118,7 +118,7 @@ export default function SlideExporter({
   onExportComplete,
   variant = "page",
 }: SlideExporterProps) {
-  const { domSlideSize, exportPixelRatio, themeStyles } = usePresentationSettings();
+  const { domSlideSize, exportPixelRatio } = usePresentationSettings();
   const [activeExport, setActiveExport] = useState<ExportFormat | null>(null);
   const [toast, setToast] = useState<ExportToast>({
     message: "",
@@ -333,12 +333,10 @@ export default function SlideExporter({
   const buttonClassName =
     variant === "header"
       ? cn(
-          themeStyles.appControlClass,
-          "inline-grid min-h-10 place-items-center rounded-xl px-3 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          "inline-grid min-h-10 place-items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-60"
         )
       : cn(
-          themeStyles.appPrimaryButtonClass,
-          "grid w-full place-items-center rounded-3xl px-6 py-4 text-xl font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          "grid w-full place-items-center rounded-3xl bg-slate-950 px-6 py-4 text-xl font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600 disabled:cursor-not-allowed disabled:opacity-60"
         );
 
   const wrapperClassName =
@@ -397,8 +395,8 @@ export default function SlideExporter({
         <div
           className={cn(
             toast.tone === "error"
-              ? themeStyles.appToastErrorClass
-              : themeStyles.appToastInfoClass,
+              ? "border-red-200 bg-red-50 text-red-800"
+              : "border-slate-200 bg-white text-slate-800",
             "mx-auto grid min-h-10 w-fit max-w-full place-items-center rounded-full border px-5 py-2 text-sm font-medium shadow-[0_20px_60px_rgba(15,23,42,0.18)] backdrop-blur-xl transition-all duration-250 ease-out",
             toast.phase === "visible" || toast.phase === "enter"
               ? "scale-100"

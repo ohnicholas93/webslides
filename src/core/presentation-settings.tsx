@@ -8,7 +8,6 @@ import {
   useState,
 } from "react";
 
-import { themes, type ThemeName } from "@/components/slide-styles";
 import {
   defaultPresentationSettings,
   getDomSlideSize,
@@ -23,11 +22,9 @@ type PresentationSettingsContextValue = {
   settings: PresentationSettings;
   setAspectRatio: (value: AspectRatioKey) => void;
   setResolution: (value: ResolutionKey) => void;
-  setTheme: (value: ThemeName) => void;
   setSafeAutoSizing: (value: boolean) => void;
   domSlideSize: { width: number; height: number };
   exportPixelRatio: number;
-  themeStyles: (typeof themes)[ThemeName];
 };
 
 const PresentationSettingsContext =
@@ -76,14 +73,6 @@ export function PresentationSettingsProvider({
     });
   }, []);
 
-  const setTheme = useCallback((value: ThemeName) => {
-    setSettings((prev) => {
-      const next = { ...prev, theme: value };
-      setCookie(PRESENTATION_COOKIE_KEYS.theme, value);
-      return next;
-    });
-  }, []);
-
   const setSafeAutoSizing = useCallback((value: boolean) => {
     setSettings((prev) => {
       const next = { ...prev, safeAutoSizing: value };
@@ -98,30 +87,22 @@ export function PresentationSettingsProvider({
     [settings]
   );
 
-  const themeStyles = useMemo(() => {
-    return themes[settings.theme] ?? themes[defaultPresentationSettings.theme];
-  }, [settings.theme]);
-
   const value = useMemo<PresentationSettingsContextValue>(
     () => ({
       settings,
       setAspectRatio,
       setResolution,
-      setTheme,
       setSafeAutoSizing,
       domSlideSize,
       exportPixelRatio,
-      themeStyles,
     }),
     [
       domSlideSize,
       exportPixelRatio,
       setAspectRatio,
       setResolution,
-      setTheme,
       setSafeAutoSizing,
       settings,
-      themeStyles,
     ]
   );
 

@@ -6,13 +6,10 @@ import { Settings } from "lucide-react";
 import SettingsModal from "@/core/settings-modal";
 import PresentationRuntimeControls from "@/core/presentation-runtime";
 import SlideExporter from "@/core/slide-exporter";
-import { usePresentationSettings } from "@/core/presentation-settings";
-import { cn } from "@/lib/utils";
 
 export default function AppHeader() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
-  const { themeStyles } = usePresentationSettings();
 
   useEffect(() => {
     const node = headerRef.current;
@@ -34,19 +31,16 @@ export default function AppHeader() {
     <>
       <header
         ref={headerRef}
-        className={themeStyles.appHeaderClass}
+        className="sticky top-0 z-50 border-b border-slate-200 bg-white/90 text-slate-950 shadow-sm backdrop-blur-xl"
       >
         <div className="mx-auto grid w-full grid-cols-[auto_minmax(0,1fr)] items-center gap-6 px-8 py-4">
           <div className="grid grid-cols-[1fr] items-center select-none">
             <div className="flex items-baseline gap-0 font-semibold tracking-tight">
-              <span className={cn(themeStyles.appHeaderBrandPrimaryClass, "text-xl")}>
+              <span className="text-xl text-slate-950">
                 Web
               </span>
               <span
-                className={cn(
-                  themeStyles.appHeaderBrandSecondaryClass,
-                  "scale-95 rounded-lg text-xl leading-none font-light"
-                )}
+                className="scale-95 rounded-lg text-xl leading-none font-light text-cyan-700"
               >
                 Slides
               </span>
@@ -59,10 +53,7 @@ export default function AppHeader() {
             <button
               type="button"
               onClick={() => setIsSettingsOpen(true)}
-              className={cn(
-                themeStyles.appControlClass,
-                "inline-grid h-10 w-10 place-items-center rounded-xl p-2 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-              )}
+              className="inline-grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
               aria-label="Open settings"
             >
               <Settings className="h-5 w-5" />

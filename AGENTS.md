@@ -8,7 +8,11 @@
 - Keep typography and spacing presentation-friendly: readable at a distance, consistent hierarchy.
 - When adding images, assume they live in `public/assets/` and are referenced like `assets/<filename>`.
 - You may use figures, diagrams, images, tables, etc. provided from the reference content (if available). These do not come with captions.
-- Make sure to use the correct and appropriate theme class tokens.
+- Do not use repo-level themes for slide content; new deck visuals should live in `src/app/page.tsx`.
+- Prefer code-defined, content-specific visual design in `src/app/page.tsx`.
+- You may define any reusable helper components, class constants, data structures, SVG diagrams, or layout primitives needed for the deck.
+- Prefer reuse where it improves coherence or reduces duplication, but do not force a global theme object. Each slide may have a distinct visual treatment when that better communicates the content.
+- Keep important content visible in the final exported slide state. Do not use auto-playing carousels, looping hidden-content animations, marquees, or timing-dependent content as the primary way to communicate information.
 - For math/LaTeX, use `Latex` from `@/components/latex`. 
   - **Mandatory**: Always wrap content in `{String.raw`...`}` (e.g., `<Latex>{String.raw`$E=mc^2$`}</Latex>`).
   - **Mandatory**: Use explicit delimiters (`$ ... $` for inline, `$$ ... $$` for display) inside the `String.raw` block.
@@ -30,4 +34,3 @@
 - Keep a TSX comment immediately before every rendered `<PresentationSlide>`, using sequential markers such as `{/* Slide 01 */}`.
 - When a slide is added, removed, moved, or commented out, renumber all remaining slide markers so they match the rendered slide order with no gaps.
 - If a slide block is temporarily disabled, update affected markers immediately; do not leave stale numbering behind. 
-

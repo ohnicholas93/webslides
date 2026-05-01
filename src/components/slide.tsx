@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import CustomImage from "@/core/image";
 import { usePresentationSettings } from "@/core/presentation-settings";
 import { cn } from "@/lib/utils";
 
 type PresentationSlideProps = {
   children: React.ReactNode;
   className?: string;
-  hideLogo?: boolean;
   title?: string;
 };
 
@@ -15,9 +13,8 @@ export default function PresentationSlide({
   children,
   className,
   title,
-  hideLogo = false,
 }: PresentationSlideProps) {
-  const { domSlideSize, settings, themeStyles } = usePresentationSettings();
+  const { domSlideSize, settings } = usePresentationSettings();
   const containerRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const baselineDevicePixelRatioRef = useRef<number | null>(null);
@@ -170,8 +167,7 @@ export default function PresentationSlide({
               height: domSlideSize.height,
             }}
             className={cn(
-              themeStyles.slideClass,
-              "relative grid overflow-hidden px-14 pt-12 pb-12",
+              "relative grid overflow-hidden bg-white px-14 pt-12 pb-12 text-slate-950",
               "grid-rows-[auto_1fr]",
               className
             )}
@@ -179,15 +175,13 @@ export default function PresentationSlide({
             <div className="relative z-50 mb-8 grid w-full grid-cols-[1fr_auto] items-start gap-6 px-0.5">
               <div
                 className={cn(
-                  themeStyles.slideMetaTextClass,
-                  "flex items-center gap-3 text-xl uppercase tracking-[0.35em]"
+                  "flex items-center gap-3 text-xl uppercase tracking-[0.35em] text-slate-500"
                 )}
               >
                 {formattedNumber && title && (
                   <span
                     className={cn(
-                      themeStyles.slideMetaNumberClass,
-                      "font-semibold tracking-[0.4em]"
+                      "font-semibold tracking-[0.4em] text-slate-900"
                     )}
                   >
                     {formattedNumber}
@@ -196,26 +190,9 @@ export default function PresentationSlide({
                 {title && formattedNumber && <span aria-hidden="true">—</span>}
                 <span>{title}</span>
               </div>
-              {!hideLogo && (
-                <div className="relative z-50 mr-0.5 grid w-max place-items-center overflow-visible">
-                  <div
-                    className="absolute w-full h-[80%] top-[12.5%] scale-200 z-10"
-                    style={{
-                      background: `radial-gradient(ellipse at center, ${themeStyles.logoHaloColor} 0%, transparent 60%)`,
-                    }}
-                  />
-                  <CustomImage
-                    path="assets/logo.png"
-                    className="relative z-50 h-14 w-max border-0 text-[11px] uppercase tracking-[0.3em]"
-                  />
-                </div>
-              )}
             </div>
             <div className="relative z-50 flex min-h-0 w-full flex-1 flex-col">
               {children}
-            </div>
-            <div className="absolute inset-0 z-10">
-              <div className={themeStyles.slideBackgroundClass}></div>
             </div>
           </section>
         </div>

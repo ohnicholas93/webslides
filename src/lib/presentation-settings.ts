@@ -1,9 +1,6 @@
-import { themes, type ThemeName } from "@/components/slide-styles";
-
 export const PRESENTATION_COOKIE_KEYS = {
   aspectRatio: "webslides_aspect_ratio",
   resolution: "webslides_resolution",
-  theme: "webslides_theme",
   safeAutoSizing: "webslides_safe_auto_sizing",
 } as const;
 
@@ -27,7 +24,6 @@ export type ResolutionKey = (typeof resolutionOptions)[number]["key"];
 export type PresentationSettings = {
   aspectRatio: AspectRatioKey;
   resolution: ResolutionKey;
-  theme: ThemeName;
   safeAutoSizing: boolean;
 };
 
@@ -36,7 +32,6 @@ export const DOM_BASE_HEIGHT_PX = 1080;
 export const defaultPresentationSettings: PresentationSettings = {
   aspectRatio: "16:9",
   resolution: "QHD",
-  theme: "Aurora",
   safeAutoSizing: true,
 };
 
@@ -46,10 +41,6 @@ function isAspectRatioKey(value: unknown): value is AspectRatioKey {
 
 function isResolutionKey(value: unknown): value is ResolutionKey {
   return resolutionOptions.some((option) => option.key === value);
-}
-
-function isThemeName(value: unknown): value is ThemeName {
-  return typeof value === "string" && value in themes;
 }
 
 function parseCookieBoolean(value: unknown): boolean | null {
@@ -97,7 +88,6 @@ export function readPresentationSettingsFromCookieStore(
 ): PresentationSettings {
   const rawAspect = store.get(PRESENTATION_COOKIE_KEYS.aspectRatio)?.value;
   const rawRes = store.get(PRESENTATION_COOKIE_KEYS.resolution)?.value;
-  const rawTheme = store.get(PRESENTATION_COOKIE_KEYS.theme)?.value;
   const rawSafeAutoSizing =
     store.get(PRESENTATION_COOKIE_KEYS.safeAutoSizing)?.value;
   const safeAutoSizingParsed = parseCookieBoolean(rawSafeAutoSizing);
@@ -105,7 +95,6 @@ export function readPresentationSettingsFromCookieStore(
   return {
     aspectRatio: isAspectRatioKey(rawAspect) ? rawAspect : fallback.aspectRatio,
     resolution: isResolutionKey(rawRes) ? rawRes : fallback.resolution,
-    theme: isThemeName(rawTheme) ? (rawTheme as ThemeName) : fallback.theme,
     safeAutoSizing:
       safeAutoSizingParsed === null
         ? fallback.safeAutoSizing
