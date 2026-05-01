@@ -44,19 +44,19 @@ const exportOptions: {
   {
     format: "png",
     title: "PNGs",
-    description: "One image per slide, zipped.",
+    description: "One image per slide, zipped to one file.",
     icon: FileImage,
   },
   {
     format: "pptx",
     title: "PPTX",
-    description: "PowerPoint with slide images.",
+    description: "PowerPoint built with rendered slide images.",
     icon: FileArchive,
   },
   {
     format: "pdf",
     title: "PDF",
-    description: "Static deck for sharing.",
+    description: "Static scrollable deck for portable sharing.",
     icon: FileText,
   },
 ];

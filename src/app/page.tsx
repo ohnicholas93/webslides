@@ -155,10 +155,10 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative grid place-items-center">
+            <div className="relative grid min-h-[32rem] overflow-visible place-items-center mr-5.5">
               <div className="absolute h-[30rem] w-[30rem] animate-[webslides-orbit_18s_linear_infinite] rounded-full border border-sky-200/70" />
               <div className="absolute h-[22rem] w-[22rem] animate-[webslides-orbit_13s_linear_infinite_reverse] rounded-full border border-blue-200/80" />
-              <div className="relative grid h-[24.5rem] w-[24.5rem] animate-[webslides-float_5s_ease-in-out_infinite] grid-rows-[auto_1fr] overflow-hidden rounded-[2.2rem] border border-slate-950/10 bg-[#0e3047] p-7 text-white shadow-[0_50px_120px_rgba(15,48,80,0.26)]">
+              <div className="relative grid aspect-square w-full animate-[webslides-float_5s_ease-in-out_infinite] grid-rows-[auto_1fr] overflow-visible rounded-[2.2rem] border border-slate-950/10 bg-[#0e3047] p-7 text-white shadow-[0_50px_120px_rgba(15,48,80,0.26)]">
                 <div className="flex items-center justify-between">
                   <div className="flex gap-2">
                     <span className="h-3 w-3 rounded-full bg-[#f8c15f]" />
