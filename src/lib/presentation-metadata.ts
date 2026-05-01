@@ -8,8 +8,6 @@ export type PresentationMetadata = {
   updatedAt: string;
   presenterNotes: PresenterNote[];
 };
-
-export const PRESENTATION_METADATA_STORAGE_KEY = "webslides_metadata";
 export const DEFAULT_DECK_ID = "webslides";
 
 export function createDefaultMetadata(): PresentationMetadata {
@@ -85,4 +83,11 @@ export function setPresenterNote(
     updatedAt: new Date().toISOString(),
     presenterNotes: nextNotes.sort((a, b) => a.slideNumber - b.slideNumber),
   };
+}
+
+export function metadataFingerprint(metadata: PresentationMetadata) {
+  return JSON.stringify({
+    deckId: metadata.deckId,
+    presenterNotes: metadata.presenterNotes,
+  });
 }

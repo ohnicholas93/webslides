@@ -7,13 +7,11 @@ import {
   ChevronRight,
   Clock3,
   CircleSlash2,
-  Download,
   FileJson,
   LayoutPanelLeft,
   Maximize2,
   PanelRightOpen,
   PlugZap,
-  Upload,
   X,
 } from "lucide-react";
 
@@ -21,8 +19,8 @@ import { usePresentationSettings } from "@/core/presentation-settings";
 import {
   createDefaultMetadata,
   getPresenterNote,
+  metadataFingerprint,
   normalizeMetadata,
-  PRESENTATION_METADATA_STORAGE_KEY,
   setPresenterNote,
   type PresentationMetadata,
 } from "@/lib/presentation-metadata";
@@ -40,6 +38,7 @@ import { cn } from "@/lib/utils";
 
 type RuntimeMode = "present" | "presenter" | null;
 type ConnectionState = "connecting" | "connected" | "disconnected";
+type NotesSyncState = "loading" | "saving" | "synced" | "error";
 
 type SlideSnapshot = {
   html: string;
@@ -47,18 +46,7 @@ type SlideSnapshot = {
 };
 
 const LAST_SLIDE_INDEX_STORAGE_KEY = "webslides:last-slide-index";
-
-function downloadJson(value: unknown, fileName: string) {
-  const blob = new Blob([JSON.stringify(value, null, 2)], {
-    type: "application/json",
-  });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  link.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
-}
+const NOTES_API_ENDPOINT = "/api/presenter-notes";
 
 function clampSlideIndex(index: number, slideCount: number) {
   if (slideCount <= 0) return 0;
@@ -66,27 +54,32 @@ function clampSlideIndex(index: number, slideCount: number) {
   return Math.min(Math.max(index, 0), slideCount - 1);
 }
 
-function getDeckBaseName() {
-  const sanitized = document.title
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
+async function fetchMetadataFromFile(signal?: AbortSignal) {
+  const response = await fetch(NOTES_API_ENDPOINT, {
+    cache: "no-store",
+    signal,
+  });
+  if (!response.ok) {
+    throw new Error(`Unable to load presenter notes: ${response.status}`);
+  }
 
-  return sanitized || "webslides";
+  return normalizeMetadata(await response.json());
 }
 
-function readStoredMetadata() {
-  const fallback = createDefaultMetadata();
-  const raw = window.localStorage.getItem(PRESENTATION_METADATA_STORAGE_KEY);
-  if (!raw) return fallback;
+async function saveMetadataToFile(metadata: PresentationMetadata) {
+  const response = await fetch(NOTES_API_ENDPOINT, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(metadata),
+  });
 
-  try {
-    return normalizeMetadata(JSON.parse(raw), fallback);
-  } catch {
-    return fallback;
+  if (!response.ok) {
+    throw new Error(`Unable to save presenter notes: ${response.status}`);
   }
+
+  return normalizeMetadata(await response.json(), metadata);
 }
 
 function getSlideSnapshots() {
@@ -457,9 +450,8 @@ function MetadataModal({
   clientId,
   wsUrl,
   connectionState,
+  notesSyncState,
   onClose,
-  onImport,
-  onDownload,
   onSessionIdChange,
   onUpdateNote,
   onWsUrlChange,
@@ -471,15 +463,12 @@ function MetadataModal({
   clientId: string;
   wsUrl: string;
   connectionState: ConnectionState;
+  notesSyncState: NotesSyncState;
   onClose: () => void;
-  onImport: (file: File) => void;
-  onDownload: () => void;
   onSessionIdChange: (value: string) => void;
   onUpdateNote: (slideNumber: number, notes: string) => void;
   onWsUrlChange: (value: string) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   if (!open) return null;
 
   return createPortal(
@@ -535,35 +524,18 @@ function MetadataModal({
                 {connectionState}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => inputRef.current?.click()}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
-              >
-                <Upload className="h-4 w-4" />
-                Open
-              </button>
-              <button
-                type="button"
-                onClick={onDownload}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
-              >
-                <Download className="h-4 w-4" />
-                Download
-              </button>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+              <p className="text-sm font-medium text-slate-600">Notes file</p>
+              <p className="mt-2 font-mono text-sm text-slate-900">
+                public/notes.json
+              </p>
+              <p className="mt-2">
+                Sync:{" "}
+                <span className="font-semibold text-slate-950">
+                  {notesSyncState}
+                </span>
+              </p>
             </div>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="application/json,.json"
-              className="hidden"
-              onChange={(event) => {
-                const file = event.target.files?.[0];
-                if (file) onImport(file);
-                event.currentTarget.value = "";
-              }}
-            />
           </div>
 
           <div className="min-h-0 overflow-y-auto pr-1">
@@ -705,7 +677,7 @@ export default function PresentationRuntimeControls() {
     typeof window === "undefined" ? 0 : readStoredSlideIndex()
   );
   const [metadata, setMetadata] = useState<PresentationMetadata>(() =>
-    typeof window === "undefined" ? createDefaultMetadata() : readStoredMetadata()
+    createDefaultMetadata()
   );
   const [clientId] = useState(() =>
     typeof window === "undefined" ? "" : getPresentationClientId()
@@ -718,11 +690,15 @@ export default function PresentationRuntimeControls() {
   );
   const [connectionState, setConnectionState] =
     useState<ConnectionState>("connecting");
+  const [notesSyncState, setNotesSyncState] =
+    useState<NotesSyncState>("loading");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const socketRef = useRef<WebSocket | null>(null);
   const metadataRef = useRef(metadata);
   const modeRef = useRef(mode);
   const slidesLengthRef = useRef(slides.length);
+  const metadataSaveTimerRef = useRef<number | null>(null);
+  const isSavingMetadataRef = useRef(false);
 
   const setMode = (nextMode: RuntimeMode) => {
     if (nextMode) {
@@ -740,12 +716,63 @@ export default function PresentationRuntimeControls() {
     window.history.replaceState({}, "", url);
   };
 
-  const persistMetadata = (next: PresentationMetadata) => {
-    window.localStorage.setItem(
-      PRESENTATION_METADATA_STORAGE_KEY,
-      JSON.stringify(next)
-    );
-  };
+  const persistMetadata = useCallback((next: PresentationMetadata) => {
+    if (metadataSaveTimerRef.current !== null) {
+      window.clearTimeout(metadataSaveTimerRef.current);
+    }
+
+    setNotesSyncState("saving");
+    metadataSaveTimerRef.current = window.setTimeout(async () => {
+      isSavingMetadataRef.current = true;
+
+      try {
+        const saved = await saveMetadataToFile(next);
+        setMetadata((current) => {
+          if (metadataFingerprint(current) !== metadataFingerprint(next)) {
+            return current;
+          }
+
+          metadataRef.current = saved;
+          return saved;
+        });
+        setNotesSyncState("synced");
+      } catch {
+        setNotesSyncState("error");
+      } finally {
+        isSavingMetadataRef.current = false;
+        metadataSaveTimerRef.current = null;
+      }
+    }, 200);
+  }, []);
+
+  const refreshMetadata = useCallback(
+    async ({ quiet = false }: { quiet?: boolean } = {}) => {
+      if (isSavingMetadataRef.current || metadataSaveTimerRef.current !== null) {
+        return;
+      }
+
+      if (!quiet) {
+        setNotesSyncState("loading");
+      }
+
+      try {
+        const next = await fetchMetadataFromFile();
+        setMetadata((current) => {
+          if (metadataFingerprint(current) === metadataFingerprint(next)) {
+            metadataRef.current = current;
+            return current;
+          }
+
+          metadataRef.current = next;
+          return next;
+        });
+        setNotesSyncState("synced");
+      } catch {
+        setNotesSyncState("error");
+      }
+    },
+    []
+  );
 
   const sendMessage = useCallback((message: PresentationSessionMessage) => {
     const socket = socketRef.current;
@@ -754,6 +781,7 @@ export default function PresentationRuntimeControls() {
   }, []);
 
   const applyMetadata = (next: PresentationMetadata, shouldBroadcast = true) => {
+    metadataRef.current = next;
     setMetadata(next);
     persistMetadata(next);
 
@@ -790,18 +818,15 @@ export default function PresentationRuntimeControls() {
   };
 
   useEffect(() => {
-    fetch("/metadata.json")
-      .then((response) => (response.ok ? response.json() : null))
-      .then((json) => {
-        const stored = window.localStorage.getItem(
-          PRESENTATION_METADATA_STORAGE_KEY
-        );
-        if (stored || !json) return;
-        const seeded = normalizeMetadata(json);
-        setMetadata(seeded);
-        persistMetadata(seeded);
-      })
-      .catch(() => {});
+    void refreshMetadata();
+  }, [refreshMetadata]);
+
+  useEffect(() => {
+    return () => {
+      if (metadataSaveTimerRef.current !== null) {
+        window.clearTimeout(metadataSaveTimerRef.current);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -978,11 +1003,26 @@ export default function PresentationRuntimeControls() {
     return () => window.clearInterval(timer);
   }, [mode]);
 
-  const importMetadata = async (file: File) => {
-    const text = await file.text();
-    const next = normalizeMetadata(JSON.parse(text), metadata);
-    applyMetadata(next);
-  };
+  useEffect(() => {
+    const refresh = () => {
+      void refreshMetadata({ quiet: true });
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refresh();
+      }
+    };
+
+    const interval = window.setInterval(refresh, 2000);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [refreshMetadata]);
 
   const updateWsUrl = (value: string) => {
     setWsUrl(value);
@@ -1041,11 +1081,8 @@ export default function PresentationRuntimeControls() {
         clientId={clientId}
         wsUrl={wsUrl}
         connectionState={connectionState}
+        notesSyncState={notesSyncState}
         onClose={() => setIsMetadataOpen(false)}
-        onImport={importMetadata}
-        onDownload={() =>
-          downloadJson(metadata, `${getDeckBaseName()}-metadata.json`)
-        }
         onSessionIdChange={updateSessionId}
         onUpdateNote={updateNote}
         onWsUrlChange={updateWsUrl}
