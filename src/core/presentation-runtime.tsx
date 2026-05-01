@@ -9,6 +9,7 @@ import {
   CircleSlash2,
   Download,
   FileJson,
+  LayoutPanelLeft,
   Maximize2,
   PanelRightOpen,
   PlugZap,
@@ -44,6 +45,8 @@ type SlideSnapshot = {
   html: string;
   title: string;
 };
+
+const LAST_SLIDE_INDEX_STORAGE_KEY = "webslides:last-slide-index";
 
 function downloadJson(value: unknown, fileName: string) {
   const blob = new Blob([JSON.stringify(value, null, 2)], {
@@ -92,6 +95,14 @@ function getSlideSnapshots() {
       html: slide.outerHTML,
       title: slide.dataset.slideTitle || `Slide ${index + 1}`,
     }));
+}
+
+function readStoredSlideIndex() {
+  const raw = window.localStorage.getItem(LAST_SLIDE_INDEX_STORAGE_KEY);
+  if (!raw) return 0;
+
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function SlidePreview({
@@ -275,14 +286,14 @@ function PresentationOverlay({
   const slideNumber = slideIndex + 1;
   const presenterScale = Math.min(
     1,
-    Math.max(320, viewport.width - presenterSidebarWidth - 72) /
+    Math.max(320, viewport.width - presenterSidebarWidth - 33) /
       domSlideSize.width,
     Math.max(320, viewport.height - 132) / domSlideSize.height
   );
   const presentScale = Math.min(
     1,
-    (Math.max(320, viewport.width) - 48) / domSlideSize.width,
-    (Math.max(320, viewport.height) - 48) / domSlideSize.height
+    Math.max(320, viewport.width) / domSlideSize.width,
+    Math.max(320, viewport.height) / domSlideSize.height
   );
   const scale = isPresenter ? presenterScale : presentScale;
   const minutes = Math.floor(elapsedSeconds / 60);
@@ -301,7 +312,7 @@ function PresentationOverlay({
         data-presentation-runtime
       >
         <div className="absolute inset-0 bg-[#08111f]" />
-        <div className="relative z-10 flex h-full items-center justify-center p-4">
+        <div className="relative z-10 flex h-full items-center justify-center">
           <SlidePreview
             slide={currentSlide}
             scale={scale}
@@ -321,7 +332,7 @@ function PresentationOverlay({
       <div className="absolute inset-0 bg-[#0d1117]" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)] [background-size:44px_44px]" />
 
-      <div className="relative z-10 grid h-full grid-rows-[auto_1fr_auto] gap-3 p-3">
+      <div className="relative z-10 grid h-full grid-rows-[auto_1fr_auto] gap-3 px-[16.5px] py-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-white/5">
@@ -356,7 +367,7 @@ function PresentationOverlay({
             gridTemplateColumns: `minmax(0,1fr) 16px ${presenterSidebarWidth}px`,
           }}
         >
-          <div className="grid min-h-0 place-items-center">
+          <div className="relative z-0 grid min-h-0 overflow-hidden place-items-center">
             <SlidePreview
               slide={currentSlide}
               scale={scale}
@@ -364,7 +375,7 @@ function PresentationOverlay({
             />
           </div>
 
-          <div className="relative flex items-stretch justify-center">
+          <div className="relative z-20 flex items-center justify-center">
             <button
               type="button"
               aria-label="Resize presenter sidebar"
@@ -374,9 +385,9 @@ function PresentationOverlay({
                   startWidth: presenterSidebarWidth,
                 };
               }}
-              className="group absolute inset-y-0 left-1/2 z-20 flex w-4 -translate-x-1/2 cursor-col-resize items-center justify-center"
+              className="group absolute left-1/2 z-30 flex w-8 -translate-x-1/2 cursor-col-resize items-center justify-center"
             >
-              <span className="h-20 w-1 rounded-full bg-white/10 transition group-hover:bg-white/25" />
+              <span className="h-28 w-1 rounded-full border border-white/10 bg-white/20 shadow-[0_0_0_1px_rgba(0,0,0,0.1)] transition group-hover:bg-white/35" />
             </button>
           </div>
 
@@ -471,7 +482,7 @@ function MetadataModal({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-[900] grid justify-items-center overflow-y-auto bg-slate-950/40 px-4 py-6">
       <div className="my-auto grid max-h-[calc(100vh-3rem)] w-full max-w-[1120px] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-950 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
         <div className="flex items-start justify-between gap-5 border-b border-slate-200 px-5 py-4">
@@ -585,15 +596,114 @@ function MetadataModal({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
+  );
+}
+
+function ViewModeModal({
+  open,
+  onClose,
+  onPresent,
+  onPresenter,
+  onNotes,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onPresent: () => void;
+  onPresenter: () => void;
+  onNotes: () => void;
+}) {
+  if (!open) return null;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[910] grid place-items-center bg-slate-950/40 px-4 py-6 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Presentation view options"
+    >
+      <button
+        type="button"
+        className="absolute inset-0"
+        aria-label="Close view options"
+        onClick={onClose}
+      />
+      <div className="relative w-full max-w-3xl rounded-xl border border-slate-200 bg-white p-6 text-slate-950 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
+        <div className="flex items-start justify-between gap-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+              View
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+              Choose a mode
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white text-slate-600 transition hover:bg-slate-50"
+            aria-label="Close"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {[
+            {
+              title: "Fullscreen Mode",
+              description: "Slide-only view for presenting.",
+              icon: Maximize2,
+              onClick: onPresent,
+            },
+            {
+              title: "Presenter View",
+              description: "Current slide, notes, and next slide.",
+              icon: PanelRightOpen,
+              onClick: onPresenter,
+            },
+            {
+              title: "Notes",
+              description: "Session settings and presenter notes.",
+              icon: FileJson,
+              onClick: onNotes,
+            },
+          ].map(({ title, description, icon: Icon, onClick }) => (
+            <button
+              key={title}
+              type="button"
+              onClick={onClick}
+              className="grid min-h-44 content-between rounded-lg border border-slate-200 bg-slate-50 p-5 text-left transition hover:border-slate-300 hover:bg-white"
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700">
+                <Icon className="h-5 w-5" />
+              </span>
+              <span>
+                <span className="block text-xl font-semibold text-slate-950">
+                  {title}
+                </span>
+                <span className="mt-2 block text-sm leading-6 text-slate-600">
+                  {description}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>,
+    document.body
   );
 }
 
 export default function PresentationRuntimeControls() {
   const [mode, setModeState] = useState<RuntimeMode>(null);
   const [isMetadataOpen, setIsMetadataOpen] = useState(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [slides, setSlides] = useState<SlideSnapshot[]>([]);
-  const [slideIndex, setSlideIndex] = useState(0);
+  const [slideIndex, setSlideIndex] = useState(() =>
+    typeof window === "undefined" ? 0 : readStoredSlideIndex()
+  );
   const [metadata, setMetadata] = useState<PresentationMetadata>(() =>
     typeof window === "undefined" ? createDefaultMetadata() : readStoredMetadata()
   );
@@ -619,6 +729,7 @@ export default function PresentationRuntimeControls() {
       setElapsedSeconds(0);
     }
     setModeState(nextMode);
+    setIsViewModalOpen(false);
 
     const url = new URL(window.location.href);
     if (nextMode) {
@@ -660,6 +771,7 @@ export default function PresentationRuntimeControls() {
     (nextIndex: number, shouldBroadcast = true) => {
       const clamped = clampSlideIndex(nextIndex, slides.length);
       setSlideIndex(clamped);
+      window.localStorage.setItem(LAST_SLIDE_INDEX_STORAGE_KEY, String(clamped));
 
       if (shouldBroadcast) {
         sendMessage({
@@ -716,7 +828,11 @@ export default function PresentationRuntimeControls() {
     const updateSlides = () => {
       const snapshots = getSlideSnapshots();
       setSlides(snapshots);
-      setSlideIndex((current) => clampSlideIndex(current, snapshots.length));
+      setSlideIndex((current) => {
+        const clamped = clampSlideIndex(current, snapshots.length);
+        window.localStorage.setItem(LAST_SLIDE_INDEX_STORAGE_KEY, String(clamped));
+        return clamped;
+      });
     };
 
     updateSlides();
@@ -884,34 +1000,18 @@ export default function PresentationRuntimeControls() {
     <>
       <button
         type="button"
-        onClick={() => setMode("present")}
+        onClick={() => setIsViewModalOpen(true)}
         className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
-        <Maximize2 className="h-4 w-4" />
-        Present
-      </button>
-      <button
-        type="button"
-        onClick={() => setMode("presenter")}
-        className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
-      >
-        <PanelRightOpen className="h-4 w-4" />
-        Presenter
-      </button>
-      <button
-        type="button"
-        onClick={() => setIsMetadataOpen(true)}
-        className="inline-grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
-        aria-label="Open presentation metadata"
-      >
-        <FileJson className="h-4 w-4" />
+        <LayoutPanelLeft className="h-4 w-4" />
+        View
       </button>
 
       {mode && (
-          <PresentationOverlay
-            mode={mode}
-            slides={slides}
-            slideIndex={slideIndex}
+        <PresentationOverlay
+          mode={mode}
+          slides={slides}
+          slideIndex={slideIndex}
           metadata={metadata}
           connectionState={connectionState}
           elapsedSeconds={elapsedSeconds}
@@ -921,6 +1021,17 @@ export default function PresentationRuntimeControls() {
           updateNote={updateNote}
         />
       )}
+
+      <ViewModeModal
+        open={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        onPresent={() => setMode("present")}
+        onPresenter={() => setMode("presenter")}
+        onNotes={() => {
+          setIsViewModalOpen(false);
+          setIsMetadataOpen(true);
+        }}
+      />
 
       <MetadataModal
         open={isMetadataOpen}

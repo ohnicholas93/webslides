@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
@@ -402,7 +403,8 @@ export default function SlideExporter({
         </button>
       </div>
 
-      {isModalOpen && (
+      {isModalOpen &&
+        createPortal(
         <div
           className="fixed inset-0 z-[110] grid place-items-center bg-slate-950/40 px-6 py-10 backdrop-blur-sm"
           role="dialog"
@@ -458,7 +460,8 @@ export default function SlideExporter({
               ))}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <div
