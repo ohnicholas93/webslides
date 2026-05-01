@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { Settings } from "lucide-react";
 
 import SettingsModal from "@/core/settings-modal";
+import PresentationRuntimeControls from "@/core/presentation-runtime";
 import SlideExporter from "@/core/slide-exporter";
 import { usePresentationSettings } from "@/core/presentation-settings";
 import { cn } from "@/lib/utils";
@@ -53,6 +54,7 @@ export default function AppHeader() {
           </div>
 
           <div className="flex min-w-0 items-center justify-end gap-2">
+            <PresentationRuntimeControls />
             <SlideExporter variant="header" />
             <button
               type="button"

@@ -164,6 +164,7 @@ export default function PresentationSlide({
           <section
             ref={sectionRef}
             data-slide
+            data-slide-title={title ?? ""}
             style={{
               width: domSlideSize.width,
               height: domSlideSize.height,
