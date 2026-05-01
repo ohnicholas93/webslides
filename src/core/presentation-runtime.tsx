@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Clock3,
+  CircleSlash2,
   Download,
   FileJson,
   Maximize2,
@@ -97,27 +98,41 @@ function SlidePreview({
   slide,
   scale,
   className,
+  emptyState,
 }: {
   slide?: SlideSnapshot;
   scale: number;
   className?: string;
+  emptyState?: React.ReactNode;
 }) {
   const { domSlideSize } = usePresentationSettings();
+  const scaledWidth = Math.round(domSlideSize.width * scale);
+  const scaledHeight = Math.round(domSlideSize.height * scale);
 
   if (!slide) {
     return (
-      <div className="grid min-h-80 place-items-center rounded-[2rem] border border-white/10 bg-white/5 text-xl text-white/60">
-        No slide selected
+      <div
+        className={cn("grid place-items-center", className)}
+        style={{
+          width: scaledWidth,
+          height: scaledHeight,
+        }}
+      >
+        {emptyState ?? (
+          <div className="grid h-full w-full place-items-center rounded-lg border border-white/10 bg-white/5 text-lg text-white/60">
+            No slide selected
+          </div>
+        )}
       </div>
     );
   }
 
   return (
     <div
-      className={cn("relative overflow-hidden rounded-[2rem]", className)}
+      className={cn("relative overflow-hidden", className)}
       style={{
-        width: Math.round(domSlideSize.width * scale),
-        height: Math.round(domSlideSize.height * scale),
+        width: scaledWidth,
+        height: scaledHeight,
       }}
     >
       <div
@@ -142,7 +157,7 @@ function RuntimeButton({
     <button
       type="button"
       className={cn(
-        "inline-flex h-10 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-3 text-base font-semibold text-white shadow-[0_20px_70px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-white/16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:opacity-40",
+        "inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/10 px-3 text-sm font-semibold text-white transition hover:bg-white/16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:opacity-40",
         className
       )}
       {...props}
@@ -177,8 +192,19 @@ function PresentationOverlay({
 }) {
   const { domSlideSize } = usePresentationSettings();
   const [viewport, setViewport] = useState({ width: 1280, height: 720 });
+  const [sidebarWidth, setSidebarWidth] = useState(308);
+  const sidebarDragStateRef = useRef<{
+    startX: number;
+    startWidth: number;
+  } | null>(null);
   const isPresenter = mode === "presenter";
   const isPresent = mode === "present";
+  const minSidebarWidth = 260;
+  const maxSidebarWidth = Math.min(420, Math.max(300, viewport.width - 520));
+  const presenterSidebarWidth = Math.min(
+    maxSidebarWidth,
+    Math.max(minSidebarWidth, sidebarWidth)
+  );
 
   useEffect(() => {
     const update = () => {
@@ -192,6 +218,30 @@ function PresentationOverlay({
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
+
+  useEffect(() => {
+    if (!isPresenter) return;
+
+    const onPointerMove = (event: PointerEvent) => {
+      const dragState = sidebarDragStateRef.current;
+      if (!dragState) return;
+      const delta = dragState.startX - event.clientX;
+      const nextWidth = dragState.startWidth + delta;
+      setSidebarWidth(Math.min(maxSidebarWidth, Math.max(minSidebarWidth, nextWidth)));
+    };
+
+    const onPointerUp = () => {
+      sidebarDragStateRef.current = null;
+    };
+
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
+    };
+  }, [isPresenter, maxSidebarWidth, minSidebarWidth]);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -225,8 +275,9 @@ function PresentationOverlay({
   const slideNumber = slideIndex + 1;
   const presenterScale = Math.min(
     1,
-    (Math.max(320, viewport.width - 520) - 72) / domSlideSize.width,
-    Math.max(320, viewport.height - 176) / domSlideSize.height
+    Math.max(320, viewport.width - presenterSidebarWidth - 72) /
+      domSlideSize.width,
+    Math.max(320, viewport.height - 132) / domSlideSize.height
   );
   const presentScale = Math.min(
     1,
@@ -250,7 +301,7 @@ function PresentationOverlay({
         data-presentation-runtime
       >
         <div className="absolute inset-0 bg-[#08111f]" />
-        <div className="relative z-10 flex h-full items-center justify-center p-6">
+        <div className="relative z-10 flex h-full items-center justify-center p-4">
           <SlidePreview
             slide={currentSlide}
             scale={scale}
@@ -267,39 +318,44 @@ function PresentationOverlay({
       className="fixed inset-0 z-[1000] overflow-hidden bg-[#08111f] text-white"
       data-presentation-runtime
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(50,213,255,0.22),transparent_32%),radial-gradient(circle_at_86%_12%,rgba(255,184,77,0.18),transparent_28%),linear-gradient(135deg,#08111f_0%,#0d1a2b_42%,#101010_100%)]" />
+      <div className="absolute inset-0 bg-[#0d1117]" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)] [background-size:44px_44px]" />
 
-      <div className="relative z-10 grid h-full grid-rows-[auto_1fr_auto] gap-4 p-4">
+      <div className="relative z-10 grid h-full grid-rows-[auto_1fr_auto] gap-3 p-3">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-200/20 bg-cyan-200/10">
-              <PanelRightOpen className="h-7 w-7 text-cyan-100" />
+            <div className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 bg-white/5">
+              <PanelRightOpen className="h-5 w-5 text-white/80" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-100/70">
+              <p className="text-sm font-semibold text-white/80">
                 Presenter View
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-3 py-2 text-base text-white/72 md:flex">
-              <PlugZap className="h-5 w-5" />
+            <div className="hidden items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/72 md:flex">
+              <PlugZap className="h-4 w-4" />
               {connectionLabel}
             </div>
-            <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-3 py-2 text-base text-white/72 md:flex">
-              <Clock3 className="h-5 w-5" />
+            <div className="hidden items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/72 md:flex">
+              <Clock3 className="h-4 w-4" />
               {minutes}:{seconds}
             </div>
             <RuntimeButton onClick={close} aria-label="Close presentation">
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
               Close
             </RuntimeButton>
           </div>
         </div>
 
-        <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_400px] items-center gap-4">
+        <div
+          className="grid min-h-0 items-stretch gap-0"
+          style={{
+            gridTemplateColumns: `minmax(0,1fr) 16px ${presenterSidebarWidth}px`,
+          }}
+        >
           <div className="grid min-h-0 place-items-center">
             <SlidePreview
               slide={currentSlide}
@@ -308,12 +364,25 @@ function PresentationOverlay({
             />
           </div>
 
-          <aside className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-[1.5rem] border border-white/12 bg-white/[0.075] p-4 shadow-[0_40px_120px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+          <div className="relative flex items-stretch justify-center">
+            <button
+              type="button"
+              aria-label="Resize presenter sidebar"
+              onPointerDown={(event) => {
+                sidebarDragStateRef.current = {
+                  startX: event.clientX,
+                  startWidth: presenterSidebarWidth,
+                };
+              }}
+              className="group absolute inset-y-0 left-1/2 z-20 flex w-4 -translate-x-1/2 cursor-col-resize items-center justify-center"
+            >
+              <span className="h-20 w-1 rounded-full bg-white/10 transition group-hover:bg-white/25" />
+            </button>
+          </div>
+
+          <aside className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-lg border border-white/10 bg-[#14181f] p-4">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-100/70">
-                Speaker Notes
-              </p>
-              <p className="mt-1 text-lg font-semibold text-white">
+              <p className="text-sm font-semibold text-white/72">
                 Slide {slideNumber} of {Math.max(slides.length, 1)}
               </p>
             </div>
@@ -322,32 +391,28 @@ function PresentationOverlay({
               value={getPresenterNote(metadata, slideNumber)}
               onChange={(event) => updateNote(slideNumber, event.target.value)}
               placeholder="Write presenter notes for this slide..."
-              className="mt-4 min-h-0 resize-none rounded-[1.25rem] border border-white/12 bg-black/24 p-4 text-lg leading-relaxed text-white outline-none transition placeholder:text-white/36 focus:border-cyan-200/60 focus:bg-black/32"
+              className="mt-3 min-h-0 resize-none rounded-lg border border-white/10 bg-[#0f131a] p-3 text-base leading-relaxed text-white outline-none placeholder:text-white/36 focus:border-white/25"
             />
 
-            <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-black/20 p-3">
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/50">
-                Next
-              </p>
-              <div className="mt-3 grid grid-cols-[100px_1fr] items-center gap-3">
+            <div className="mt-3 rounded-lg border border-white/10 bg-[#0f131a] p-3">
+              <p className="text-sm font-semibold text-white/60">Next</p>
+              <div className="mt-2 grid grid-cols-[72px_1fr] items-center gap-3">
                 <SlidePreview
                   slide={nextSlide}
-                  scale={Math.min(0.085, 100 / domSlideSize.width)}
-                  className="rounded-xl"
+                  scale={Math.min(0.065, 72 / domSlideSize.width)}
+                  className="rounded-md"
+                  emptyState={
+                    <div className="grid h-full w-full place-items-center rounded-md border border-white/8 bg-white/[0.03] text-white/40">
+                      <CircleSlash2 className="h-4 w-4" />
+                    </div>
+                  }
                 />
                 {nextSlide ? (
-                  <p className="line-clamp-3 text-base text-white/78">
+                  <p className="line-clamp-3 text-sm text-white/78">
                     {nextSlide.title}
                   </p>
                 ) : (
-                  <div className="rounded-[1rem] border border-white/10 bg-black/20 px-4 py-4">
-                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/50">
-                      End of deck
-                    </p>
-                    <p className="mt-2 text-base text-white/72">
-                      No next slide.
-                    </p>
-                  </div>
+                  <p className="text-sm text-white/72">End of deck</p>
                 )}
               </div>
             </div>
@@ -356,15 +421,15 @@ function PresentationOverlay({
 
         <div className="flex items-center justify-between gap-3">
           <RuntimeButton onClick={goPrev} disabled={slideIndex <= 0}>
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
             Previous
           </RuntimeButton>
-          <div className="rounded-full border border-white/10 bg-white/8 px-4 py-2 text-base font-semibold text-white/72">
+          <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-semibold text-white/72">
             {slideNumber} / {Math.max(slides.length, 1)}
           </div>
           <RuntimeButton onClick={goNext} disabled={slideIndex >= slides.length - 1}>
             Next
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4" />
           </RuntimeButton>
         </div>
       </div>
@@ -407,56 +472,53 @@ function MetadataModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[900] grid place-items-center bg-slate-950/50 px-5 py-8 backdrop-blur">
-      <div className="grid max-h-[92vh] w-full max-w-6xl grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-[2rem] border border-slate-200 bg-[#f8faf7] text-slate-950 shadow-2xl">
-        <div className="flex items-start justify-between gap-5 border-b border-slate-200 bg-white/80 p-6">
+    <div className="fixed inset-0 z-[900] grid justify-items-center overflow-y-auto bg-slate-950/40 px-4 py-6">
+      <div className="my-auto grid max-h-[calc(100vh-3rem)] w-full max-w-[1120px] grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-950 shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
+        <div className="flex items-start justify-between gap-5 border-b border-slate-200 px-5 py-4">
           <div>
-            <p className="text-xl font-semibold uppercase tracking-[0.24em] text-slate-500">
-              Metadata Studio
-            </p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight">
+            <h2 className="text-xl font-semibold tracking-tight">
               Presenter notes and session sync
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid h-11 w-11 place-items-center rounded-2xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50"
+            className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-50"
             aria-label="Close metadata"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="grid min-h-0 grid-cols-[360px_1fr] gap-5 overflow-hidden p-6">
+        <div className="grid min-h-0 grid-cols-[280px_minmax(0,1fr)] gap-4 overflow-hidden p-4">
           <div className="flex min-h-0 flex-col gap-4">
-            <label className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm">
-              <span className="text-xl font-semibold text-slate-500">
+            <label className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <span className="text-sm font-medium text-slate-600">
                 Session ID
               </span>
               <input
                 value={sessionId}
                 onChange={(event) => onSessionIdChange(event.target.value)}
-                className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-xl text-slate-900 outline-none focus:border-slate-400"
+                className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 outline-none focus:border-slate-500"
               />
             </label>
-            <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-xl font-semibold text-slate-500">Client ID</p>
-              <p className="mt-2 break-all font-mono text-xl text-slate-900">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-medium text-slate-600">Client ID</p>
+              <p className="mt-2 break-all font-mono text-sm text-slate-900">
                 {clientId}
               </p>
             </div>
-            <label className="rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm">
-              <span className="text-xl font-semibold text-slate-500">
+            <label className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <span className="text-sm font-medium text-slate-600">
                 WebSocket URL
               </span>
               <input
                 value={wsUrl}
                 onChange={(event) => onWsUrlChange(event.target.value)}
-                className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-xl text-slate-900 outline-none focus:border-slate-400"
+                className="mt-2 w-full rounded-md border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-slate-900 outline-none focus:border-slate-500"
               />
             </label>
-            <div className="rounded-[1.5rem] border border-slate-200 bg-white p-5 text-xl text-slate-600 shadow-sm">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
               Status:{" "}
               <span className="font-semibold text-slate-950">
                 {connectionState}
@@ -466,17 +528,17 @@ function MetadataModal({
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-950 px-4 py-3 text-xl font-semibold text-white shadow-sm transition hover:bg-slate-800"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-3 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
               >
-                <Upload className="h-5 w-5" />
+                <Upload className="h-4 w-4" />
                 Open
               </button>
               <button
                 type="button"
                 onClick={onDownload}
-                className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xl font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-50"
               >
-                <Download className="h-5 w-5" />
+                <Download className="h-4 w-4" />
                 Download
               </button>
             </div>
@@ -493,7 +555,7 @@ function MetadataModal({
             />
           </div>
 
-          <div className="min-h-0 overflow-y-auto pr-2">
+          <div className="min-h-0 overflow-y-auto pr-1">
             <div className="grid gap-4">
               {slides.map((slide, index) => {
                 const slideNumber = index + 1;
@@ -501,10 +563,10 @@ function MetadataModal({
                 return (
                   <label
                     key={`${slide.title}-${slideNumber}`}
-                    className="grid gap-3 rounded-[1.5rem] border border-slate-200 bg-white p-5 shadow-sm"
+                    className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4"
                   >
                     <span className="flex items-center justify-between gap-3">
-                      <span className="text-2xl font-bold text-slate-950">
+                      <span className="text-base font-semibold text-slate-950">
                         {String(slideNumber).padStart(2, "0")} · {slide.title}
                       </span>
                     </span>
@@ -514,7 +576,7 @@ function MetadataModal({
                         onUpdateNote(slideNumber, event.target.value)
                       }
                       placeholder="Presenter notes..."
-                      className="min-h-36 resize-y rounded-2xl border border-slate-200 bg-slate-50 p-4 text-xl leading-relaxed text-slate-900 outline-none focus:border-slate-400"
+                      className="min-h-28 resize-y rounded-md border border-slate-300 bg-white p-3 text-sm leading-6 text-slate-900 outline-none focus:border-slate-500"
                     />
                   </label>
                 );
@@ -823,7 +885,7 @@ export default function PresentationRuntimeControls() {
       <button
         type="button"
         onClick={() => setMode("present")}
-        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+        className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
         <Maximize2 className="h-4 w-4" />
         Present
@@ -831,7 +893,7 @@ export default function PresentationRuntimeControls() {
       <button
         type="button"
         onClick={() => setMode("presenter")}
-        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+        className="inline-flex h-10 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
         <PanelRightOpen className="h-4 w-4" />
         Presenter
@@ -839,7 +901,7 @@ export default function PresentationRuntimeControls() {
       <button
         type="button"
         onClick={() => setIsMetadataOpen(true)}
-        className="inline-grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+        className="inline-grid h-10 w-10 place-items-center rounded-lg border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
         aria-label="Open presentation metadata"
       >
         <FileJson className="h-4 w-4" />

@@ -120,10 +120,10 @@ export default function Home() {
         {/* Slide 01 */}
         <PresentationSlide
           title="WebSlides"
-          className="bg-[radial-gradient(circle_at_78%_18%,rgba(125,211,252,0.26),transparent_34%),radial-gradient(circle_at_6%_88%,rgba(147,197,253,0.24),transparent_32%),linear-gradient(135deg,#f8fbff_0%,#eef6ff_54%,#eaf2fb_100%)] px-18 pt-14 pb-14 text-[#10213a]"
+          className="bg-[radial-gradient(circle_at_78%_18%,rgba(125,211,252,0.26),transparent_34%),radial-gradient(circle_at_6%_88%,rgba(147,197,253,0.24),transparent_32%),linear-gradient(135deg,#f8fbff_0%,#eef6ff_54%,#eaf2fb_100%)] text-[#10213a]"
         >
-          <div className="relative grid min-h-0 grid-cols-[1.08fr_0.92fr] gap-16 my-auto pb-8">
-            <div className="flex flex-col justify-center pl-2">
+          <div className="relative grid min-h-0 grid-cols-[1.3fr_1fr] gap-16 my-auto pb-8">
+            <div className="flex flex-col justify-center">
               <Pill className="w-fit border-sky-200 bg-white/66 text-sky-800">
                 <Sparkles className="h-5 w-5" />
                 Agent-authored slide systems
@@ -142,7 +142,7 @@ export default function Home() {
               </p>
 
               <div className="mt-12 grid grid-cols-3 gap-4">
-                {["Bespoke visuals", "Reusable code", "Export-safe DOM"].map(
+                {["Bespoke visuals", "Reusable local code", "Export-safe DOM"].map(
                   (item) => (
                     <div
                       key={item}
