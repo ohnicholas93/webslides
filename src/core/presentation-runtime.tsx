@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
@@ -191,6 +192,21 @@ function PresentationOverlay({
     return () => window.removeEventListener("resize", update);
   }, []);
 
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    return () => {
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+    };
+  }, []);
+
   const isPresenter = mode === "presenter";
   const slideAreaWidth = isPresenter
     ? Math.max(320, viewport.width - 520)
@@ -216,7 +232,7 @@ function PresentationOverlay({
         ? "WS connecting"
         : "WS offline";
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[1000] overflow-hidden bg-[#08111f] text-white"
       data-presentation-runtime
@@ -325,7 +341,8 @@ function PresentationOverlay({
           </RuntimeButton>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
@@ -766,17 +783,17 @@ export default function PresentationRuntimeControls() {
       <button
         type="button"
         onClick={() => setMode("present")}
-        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xl font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
-        <Maximize2 className="h-5 w-5" />
+        <Maximize2 className="h-4 w-4" />
         Present
       </button>
       <button
         type="button"
         onClick={openPresenterView}
-        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xl font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+        className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
-        <PanelRightOpen className="h-5 w-5" />
+        <PanelRightOpen className="h-4 w-4" />
         Presenter
       </button>
       <button
@@ -785,7 +802,7 @@ export default function PresentationRuntimeControls() {
         className="inline-grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white p-2 text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
         aria-label="Open presentation metadata"
       >
-        <FileJson className="h-5 w-5" />
+        <FileJson className="h-4 w-4" />
       </button>
 
       {mode && (

@@ -1,17 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import CustomImage from "@/core/image";
 import { usePresentationSettings } from "@/core/presentation-settings";
 import { cn } from "@/lib/utils";
 
 type PresentationSlideProps = {
   children: React.ReactNode;
   className?: string;
+  headerTone?: "light" | "dark";
   title?: string;
 };
 
 export default function PresentationSlide({
   children,
   className,
+  headerTone = "light",
   title,
 }: PresentationSlideProps) {
   const { domSlideSize, settings } = usePresentationSettings();
@@ -147,7 +150,7 @@ export default function PresentationSlide({
       className="grid w-full min-w-0 justify-self-stretch justify-center"
     >
       <div
-        className="relative"
+        className="relative rounded-[1.15rem] border border-slate-300/70 bg-white shadow-[0_22px_70px_rgba(15,23,42,0.14)]"
         style={{ width: scaledSize.width, height: scaledSize.height }}
       >
         <div
@@ -174,14 +177,16 @@ export default function PresentationSlide({
           >
             <div className="relative z-50 mb-8 grid w-full grid-cols-[1fr_auto] items-start gap-6 px-0.5">
               <div
-                className={cn(
-                  "flex items-center gap-3 text-xl uppercase tracking-[0.35em] text-slate-500"
+              className={cn(
+                  "flex items-center gap-3 text-xl uppercase tracking-[0.35em]",
+                  headerTone === "dark" ? "text-white/58" : "text-slate-500"
                 )}
               >
                 {formattedNumber && title && (
                   <span
                     className={cn(
-                      "font-semibold tracking-[0.4em] text-slate-900"
+                      "font-semibold tracking-[0.4em]",
+                      headerTone === "dark" ? "text-white" : "text-slate-900"
                     )}
                   >
                     {formattedNumber}
@@ -189,6 +194,13 @@ export default function PresentationSlide({
                 )}
                 {title && formattedNumber && <span aria-hidden="true">—</span>}
                 <span>{title}</span>
+              </div>
+              <div className="relative z-50 mr-0.5 grid w-max place-items-center overflow-visible">
+                <div className="absolute inset-x-0 top-1/2 h-10 -translate-y-1/2 rounded-full bg-white/70 blur-xl" />
+                <CustomImage
+                  path="assets/logo.png"
+                  className="relative z-10 h-14 w-max border-0 text-[11px] uppercase tracking-[0.3em]"
+                />
               </div>
             </div>
             <div className="relative z-50 flex min-h-0 w-full flex-1 flex-col">

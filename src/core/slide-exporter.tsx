@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
+import { Download, FileArchive, FileImage, FileText, X } from "lucide-react";
 import PptxGenJS from "pptxgenjs";
 
 import { usePresentationSettings } from "@/core/presentation-settings";
@@ -32,6 +33,32 @@ type ExportToast = {
 
 const PPTX_LAYOUT_NAME = "WEBSLIDES_CUSTOM";
 const PPTX_BASE_HEIGHT_INCHES = 7.5;
+
+const exportOptions: {
+  format: ExportFormat;
+  title: string;
+  description: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  {
+    format: "png",
+    title: "PNGs",
+    description: "One image per slide, zipped.",
+    icon: FileImage,
+  },
+  {
+    format: "pptx",
+    title: "PPTX",
+    description: "PowerPoint with slide images.",
+    icon: FileArchive,
+  },
+  {
+    format: "pdf",
+    title: "PDF",
+    description: "Static deck for sharing.",
+    icon: FileText,
+  },
+];
 
 function getDeckBaseName() {
   const title = document.title.trim().toLowerCase();
@@ -120,6 +147,7 @@ export default function SlideExporter({
 }: SlideExporterProps) {
   const { domSlideSize, exportPixelRatio } = usePresentationSettings();
   const [activeExport, setActiveExport] = useState<ExportFormat | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<ExportToast>({
     message: "",
     tone: "info",
@@ -190,6 +218,17 @@ export default function SlideExporter({
   useEffect(() => {
     return () => clearToastTimers();
   }, []);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsModalOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isModalOpen]);
 
   const captureSlides = async () => {
     const slideRoot = slidesContainerRef?.current ?? document;
@@ -293,6 +332,7 @@ export default function SlideExporter({
   };
 
   const handleExport = async (format: ExportFormat) => {
+    setIsModalOpen(false);
     setActiveExport(format);
 
     try {
@@ -341,46 +381,85 @@ export default function SlideExporter({
 
   const wrapperClassName =
     variant === "header"
-      ? "flex min-w-0 flex-1 flex-col items-end gap-1"
+      ? "flex min-w-0 flex-none flex-col items-end gap-1"
       : "w-full max-w-4xl text-center";
-
-  const buttonsClassName =
-    variant === "header"
-      ? "flex flex-wrap items-center justify-end gap-2"
-      : "grid gap-3 md:grid-cols-[1fr_1fr_1fr]";
 
   const isToastVisible = toast.phase !== "hidden";
 
   return (
     <>
       <div className={wrapperClassName}>
-        <div className={buttonsClassName}>
-          <button
-            type="button"
-            onClick={() => handleExport("png")}
-            disabled={isExporting}
-            className={buttonClassName}
-          >
-            {activeExport === "png" ? "Exporting PNGs…" : "Export as PNGs"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleExport("pptx")}
-            disabled={isExporting}
-            className={buttonClassName}
-          >
-            {activeExport === "pptx" ? "Exporting PPTX…" : "Export as PPTX"}
-          </button>
-          <button
-            type="button"
-            onClick={() => handleExport("pdf")}
-            disabled={isExporting}
-            className={buttonClassName}
-          >
-            {activeExport === "pdf" ? "Exporting PDF…" : "Export as PDF"}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setIsModalOpen(true)}
+          disabled={isExporting}
+          className={buttonClassName}
+        >
+          <span className="inline-flex items-center gap-2">
+            <Download className={variant === "header" ? "h-4 w-4" : "h-5 w-5"} />
+            {activeExport ? "Exporting..." : "Export"}
+          </span>
+        </button>
       </div>
+
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 z-[110] grid place-items-center bg-slate-950/40 px-6 py-10 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Choose export format"
+        >
+          <button
+            type="button"
+            className="absolute inset-0"
+            aria-label="Close export options"
+            onClick={() => setIsModalOpen(false)}
+          />
+          <div className="relative w-full max-w-3xl rounded-[1.75rem] border border-slate-200 bg-white p-6 text-slate-950 shadow-2xl">
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.22em] text-slate-500">
+                  Export
+                </p>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight">
+                  Choose a format
+                </h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="grid h-10 w-10 place-items-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-3">
+              {exportOptions.map(({ format, title, description, icon: Icon }) => (
+                <button
+                  key={format}
+                  type="button"
+                  onClick={() => handleExport(format)}
+                  className="group grid min-h-48 content-between rounded-2xl border border-slate-200 bg-slate-50 p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-cyan-300 hover:bg-white hover:shadow-[0_18px_55px_rgba(15,23,42,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
+                >
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-white text-cyan-700 shadow-sm ring-1 ring-slate-200 transition group-hover:bg-cyan-50 group-hover:ring-cyan-200">
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <span>
+                    <span className="block text-2xl font-bold text-slate-950">
+                      {title}
+                    </span>
+                    <span className="mt-2 block text-base leading-relaxed text-slate-600">
+                      {description}
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div
         aria-live="polite"
