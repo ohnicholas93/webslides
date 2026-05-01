@@ -9,7 +9,6 @@ import {
   Download,
   FileJson,
   Maximize2,
-  MonitorPlay,
   PanelRightOpen,
   PlugZap,
   Upload,
@@ -143,7 +142,7 @@ function RuntimeButton({
     <button
       type="button"
       className={cn(
-        "inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-4 text-xl font-semibold text-white shadow-[0_20px_70px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-white/16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:opacity-40",
+        "inline-flex h-10 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-3 text-base font-semibold text-white shadow-[0_20px_70px_rgba(0,0,0,0.22)] backdrop-blur transition hover:bg-white/16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-200 disabled:cursor-not-allowed disabled:opacity-40",
         className
       )}
       {...props}
@@ -178,6 +177,8 @@ function PresentationOverlay({
 }) {
   const { domSlideSize } = usePresentationSettings();
   const [viewport, setViewport] = useState({ width: 1280, height: 720 });
+  const isPresenter = mode === "presenter";
+  const isPresent = mode === "present";
 
   useEffect(() => {
     const update = () => {
@@ -197,32 +198,42 @@ function PresentationOverlay({
     const body = document.body;
     const previousHtmlOverflow = html.style.overflow;
     const previousBodyOverflow = body.style.overflow;
+    const previousMode = body.dataset.webslidesMode;
 
     html.style.overflow = "hidden";
     body.style.overflow = "hidden";
+    if (mode) {
+      body.dataset.webslidesMode = mode;
+    } else {
+      delete body.dataset.webslidesMode;
+    }
 
     return () => {
       html.style.overflow = previousHtmlOverflow;
       body.style.overflow = previousBodyOverflow;
+      if (previousMode) {
+        body.dataset.webslidesMode = previousMode;
+      } else {
+        delete body.dataset.webslidesMode;
+      }
     };
-  }, []);
+  }, [mode]);
 
-  const isPresenter = mode === "presenter";
-  const slideAreaWidth = isPresenter
-    ? Math.max(320, viewport.width - 520)
-    : viewport.width;
-  const slideAreaHeight = isPresenter
-    ? Math.max(320, viewport.height - 176)
-    : Math.max(320, viewport.height - 156);
-  const scale = Math.min(
-    1,
-    (slideAreaWidth - 72) / domSlideSize.width,
-    slideAreaHeight / domSlideSize.height
-  );
   const currentSlide = slides[slideIndex];
   const nextSlide =
     slideIndex + 1 < slides.length ? slides[slideIndex + 1] : undefined;
   const slideNumber = slideIndex + 1;
+  const presenterScale = Math.min(
+    1,
+    (Math.max(320, viewport.width - 520) - 72) / domSlideSize.width,
+    Math.max(320, viewport.height - 176) / domSlideSize.height
+  );
+  const presentScale = Math.min(
+    1,
+    (Math.max(320, viewport.width) - 48) / domSlideSize.width,
+    (Math.max(320, viewport.height) - 48) / domSlideSize.height
+  );
+  const scale = isPresenter ? presenterScale : presentScale;
   const minutes = Math.floor(elapsedSeconds / 60);
   const seconds = String(elapsedSeconds % 60).padStart(2, "0");
   const connectionLabel =
@@ -232,6 +243,25 @@ function PresentationOverlay({
         ? "WS connecting"
         : "WS offline";
 
+  if (isPresent) {
+    return createPortal(
+      <div
+        className="fixed inset-0 z-[1000] overflow-hidden bg-[#08111f] text-white"
+        data-presentation-runtime
+      >
+        <div className="absolute inset-0 bg-[#08111f]" />
+        <div className="relative z-10 flex h-full items-center justify-center p-6">
+          <SlidePreview
+            slide={currentSlide}
+            scale={scale}
+            className="rounded-none shadow-none"
+          />
+        </div>
+      </div>,
+      document.body
+    );
+  }
+
   return createPortal(
     <div
       className="fixed inset-0 z-[1000] overflow-hidden bg-[#08111f] text-white"
@@ -240,32 +270,25 @@ function PresentationOverlay({
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(50,213,255,0.22),transparent_32%),radial-gradient(circle_at_86%_12%,rgba(255,184,77,0.18),transparent_28%),linear-gradient(135deg,#08111f_0%,#0d1a2b_42%,#101010_100%)]" />
       <div className="absolute inset-0 opacity-[0.08] [background-image:linear-gradient(rgba(255,255,255,0.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.7)_1px,transparent_1px)] [background-size:44px_44px]" />
 
-      <div className="relative z-10 grid h-full grid-rows-[auto_1fr_auto] gap-5 p-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-4">
-            <div className="grid h-14 w-14 place-items-center rounded-2xl border border-cyan-200/20 bg-cyan-200/10">
-              {isPresenter ? (
-                <PanelRightOpen className="h-7 w-7 text-cyan-100" />
-              ) : (
-                <MonitorPlay className="h-7 w-7 text-cyan-100" />
-              )}
+      <div className="relative z-10 grid h-full grid-rows-[auto_1fr_auto] gap-4 p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="grid h-10 w-10 place-items-center rounded-2xl border border-cyan-200/20 bg-cyan-200/10">
+              <PanelRightOpen className="h-7 w-7 text-cyan-100" />
             </div>
             <div className="min-w-0">
-              <p className="text-xl font-semibold uppercase tracking-[0.28em] text-cyan-100/70">
-                {isPresenter ? "Presenter View" : "Live Presentation"}
+              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-cyan-100/70">
+                Presenter View
               </p>
-              <h2 className="truncate text-3xl font-bold tracking-tight">
-                {currentSlide?.title ?? "WebSlides"}
-              </h2>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-4 py-2 text-xl text-white/72 md:flex">
+          <div className="flex items-center gap-2">
+            <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-3 py-2 text-base text-white/72 md:flex">
               <PlugZap className="h-5 w-5" />
               {connectionLabel}
             </div>
-            <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-4 py-2 text-xl text-white/72 md:flex">
+            <div className="hidden items-center gap-2 rounded-2xl border border-white/10 bg-white/8 px-3 py-2 text-base text-white/72 md:flex">
               <Clock3 className="h-5 w-5" />
               {minutes}:{seconds}
             </div>
@@ -276,63 +299,67 @@ function PresentationOverlay({
           </div>
         </div>
 
-        <div
-          className={cn(
-            "grid min-h-0 items-center gap-6",
-            isPresenter ? "grid-cols-[minmax(0,1fr)_460px]" : "grid-cols-1"
-          )}
-        >
+        <div className="grid min-h-0 grid-cols-[minmax(0,1fr)_400px] items-center gap-4">
           <div className="grid min-h-0 place-items-center">
             <SlidePreview
               slide={currentSlide}
               scale={scale}
-              className="shadow-[0_50px_140px_rgba(0,0,0,0.48)]"
+              className="rounded-none shadow-[0_50px_140px_rgba(0,0,0,0.48)]"
             />
           </div>
 
-          {isPresenter && (
-            <aside className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-[2rem] border border-white/12 bg-white/[0.075] p-5 shadow-[0_40px_120px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
-              <div>
-                <p className="text-xl font-semibold uppercase tracking-[0.24em] text-amber-100/70">
-                  Speaker Notes
-                </p>
-                <p className="mt-2 text-2xl font-bold">
-                  Slide {slideNumber} of {Math.max(slides.length, 1)}
-                </p>
-              </div>
+          <aside className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-[1.5rem] border border-white/12 bg-white/[0.075] p-4 shadow-[0_40px_120px_rgba(0,0,0,0.28)] backdrop-blur-2xl">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-amber-100/70">
+                Speaker Notes
+              </p>
+              <p className="mt-1 text-lg font-semibold text-white">
+                Slide {slideNumber} of {Math.max(slides.length, 1)}
+              </p>
+            </div>
 
-              <textarea
-                value={getPresenterNote(metadata, slideNumber)}
-                onChange={(event) => updateNote(slideNumber, event.target.value)}
-                placeholder="Write presenter notes for this slide..."
-                className="mt-5 min-h-0 resize-none rounded-[1.5rem] border border-white/12 bg-black/24 p-5 text-xl leading-relaxed text-white outline-none transition placeholder:text-white/36 focus:border-cyan-200/60 focus:bg-black/32"
-              />
+            <textarea
+              value={getPresenterNote(metadata, slideNumber)}
+              onChange={(event) => updateNote(slideNumber, event.target.value)}
+              placeholder="Write presenter notes for this slide..."
+              className="mt-4 min-h-0 resize-none rounded-[1.25rem] border border-white/12 bg-black/24 p-4 text-lg leading-relaxed text-white outline-none transition placeholder:text-white/36 focus:border-cyan-200/60 focus:bg-black/32"
+            />
 
-              <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-black/20 p-4">
-                <p className="text-xl font-semibold uppercase tracking-[0.2em] text-white/50">
-                  Next
-                </p>
-                <div className="mt-3 grid grid-cols-[120px_1fr] items-center gap-4">
-                  <SlidePreview
-                    slide={nextSlide}
-                    scale={Math.min(0.1, 120 / domSlideSize.width)}
-                    className="rounded-xl"
-                  />
-                  <p className="line-clamp-3 text-xl text-white/78">
-                    {nextSlide?.title ?? "End of deck"}
+            <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-black/20 p-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-white/50">
+                Next
+              </p>
+              <div className="mt-3 grid grid-cols-[100px_1fr] items-center gap-3">
+                <SlidePreview
+                  slide={nextSlide}
+                  scale={Math.min(0.085, 100 / domSlideSize.width)}
+                  className="rounded-xl"
+                />
+                {nextSlide ? (
+                  <p className="line-clamp-3 text-base text-white/78">
+                    {nextSlide.title}
                   </p>
-                </div>
+                ) : (
+                  <div className="rounded-[1rem] border border-white/10 bg-black/20 px-4 py-4">
+                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/50">
+                      End of deck
+                    </p>
+                    <p className="mt-2 text-base text-white/72">
+                      No next slide.
+                    </p>
+                  </div>
+                )}
               </div>
-            </aside>
-          )}
+            </div>
+          </aside>
         </div>
 
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-3">
           <RuntimeButton onClick={goPrev} disabled={slideIndex <= 0}>
             <ChevronLeft className="h-5 w-5" />
             Previous
           </RuntimeButton>
-          <div className="rounded-full border border-white/10 bg-white/8 px-5 py-2 text-xl font-semibold text-white/72">
+          <div className="rounded-full border border-white/10 bg-white/8 px-4 py-2 text-base font-semibold text-white/72">
             {slideNumber} / {Math.max(slides.length, 1)}
           </div>
           <RuntimeButton onClick={goNext} disabled={slideIndex >= slides.length - 1}>
@@ -501,13 +528,7 @@ function MetadataModal({
 }
 
 export default function PresentationRuntimeControls() {
-  const [mode, setModeState] = useState<RuntimeMode>(() => {
-    if (typeof window === "undefined") return null;
-    const view = new URLSearchParams(window.location.search).get("webslidesView");
-    if (view === "presenter") return "presenter";
-    if (view === "present") return "present";
-    return null;
-  });
+  const [mode, setModeState] = useState<RuntimeMode>(null);
   const [isMetadataOpen, setIsMetadataOpen] = useState(false);
   const [slides, setSlides] = useState<SlideSnapshot[]>([]);
   const [slideIndex, setSlideIndex] = useState(0);
@@ -524,7 +545,7 @@ export default function PresentationRuntimeControls() {
     typeof window === "undefined" ? DEFAULT_PRESENTATION_WS_URL : getPresentationWsUrl()
   );
   const [connectionState, setConnectionState] =
-    useState<ConnectionState>("disconnected");
+    useState<ConnectionState>("connecting");
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const socketRef = useRef<WebSocket | null>(null);
   const metadataRef = useRef(metadata);
@@ -536,6 +557,14 @@ export default function PresentationRuntimeControls() {
       setElapsedSeconds(0);
     }
     setModeState(nextMode);
+
+    const url = new URL(window.location.href);
+    if (nextMode) {
+      url.searchParams.set("webslidesView", nextMode);
+    } else {
+      url.searchParams.delete("webslidesView");
+    }
+    window.history.replaceState({}, "", url);
   };
 
   const persistMetadata = (next: PresentationMetadata) => {
@@ -610,6 +639,14 @@ export default function PresentationRuntimeControls() {
   }, [mode]);
 
   useEffect(() => {
+    const view = new URLSearchParams(window.location.search).get("webslidesView");
+    if (view === "presenter" || view === "present") {
+      const timer = window.setTimeout(() => setMode(view), 0);
+      return () => window.clearTimeout(timer);
+    }
+  }, []);
+
+  useEffect(() => {
     slidesLengthRef.current = slides.length;
   }, [slides.length]);
 
@@ -639,16 +676,16 @@ export default function PresentationRuntimeControls() {
 
     let reconnectTimer: number | null = null;
     let closedByEffect = false;
+    let reconnectDelay = 1000;
 
     const connect = () => {
-      setConnectionState("connecting");
-
       try {
         const socket = new WebSocket(wsUrl);
         socketRef.current = socket;
 
         socket.addEventListener("open", () => {
           setConnectionState("connected");
+          reconnectDelay = 1000;
           sendMessage({
             type: "hello",
             sessionId,
@@ -688,16 +725,27 @@ export default function PresentationRuntimeControls() {
           }
           setConnectionState("disconnected");
           if (!closedByEffect) {
-            reconnectTimer = window.setTimeout(connect, 1800);
+            reconnectTimer = window.setTimeout(connect, reconnectDelay);
+            reconnectDelay = Math.min(Math.round(reconnectDelay * 1.8), 15000);
           }
         });
 
         socket.addEventListener("error", () => {
           setConnectionState("disconnected");
+          if (socket.readyState === WebSocket.CONNECTING) {
+            try {
+              socket.close();
+            } catch {
+              // ignore close failures
+            }
+          }
         });
       } catch {
         setConnectionState("disconnected");
-        reconnectTimer = window.setTimeout(connect, 1800);
+        if (!closedByEffect) {
+          reconnectTimer = window.setTimeout(connect, reconnectDelay);
+          reconnectDelay = Math.min(Math.round(reconnectDelay * 1.8), 15000);
+        }
       }
     };
 
@@ -752,16 +800,6 @@ export default function PresentationRuntimeControls() {
     return () => window.clearInterval(timer);
   }, [mode]);
 
-  const openPresenterView = () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("webslidesView", "presenter");
-    window.open(
-      url.toString(),
-      "webslides-presenter",
-      "popup=yes,width=1440,height=960"
-    );
-  };
-
   const importMetadata = async (file: File) => {
     const text = await file.text();
     const next = normalizeMetadata(JSON.parse(text), metadata);
@@ -771,11 +809,13 @@ export default function PresentationRuntimeControls() {
   const updateWsUrl = (value: string) => {
     setWsUrl(value);
     setPresentationWsUrl(value);
+    setConnectionState(value ? "connecting" : "disconnected");
   };
 
   const updateSessionId = (value: string) => {
     setSessionId(value);
     setPresentationSessionId(value);
+    setConnectionState(value ? "connecting" : "disconnected");
   };
 
   return (
@@ -790,7 +830,7 @@ export default function PresentationRuntimeControls() {
       </button>
       <button
         type="button"
-        onClick={openPresenterView}
+        onClick={() => setMode("presenter")}
         className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600"
       >
         <PanelRightOpen className="h-4 w-4" />
@@ -806,10 +846,10 @@ export default function PresentationRuntimeControls() {
       </button>
 
       {mode && (
-        <PresentationOverlay
-          mode={mode}
-          slides={slides}
-          slideIndex={slideIndex}
+          <PresentationOverlay
+            mode={mode}
+            slides={slides}
+            slideIndex={slideIndex}
           metadata={metadata}
           connectionState={connectionState}
           elapsedSeconds={elapsedSeconds}

@@ -24,7 +24,8 @@ function broadcast(message) {
   }
 }
 
-Bun.serve({
+try {
+  Bun.serve({
   port,
   fetch(request, server) {
     const upgraded = server.upgrade(request, {
@@ -80,3 +81,11 @@ Bun.serve({
 });
 
 console.log(`WebSlides WebSocket relay listening on ws://localhost:${port}`);
+} catch (error) {
+  if (error && typeof error === "object" && "code" in error && error.code === "EADDRINUSE") {
+    console.log(`WebSlides WebSocket relay already running on ws://localhost:${port}`);
+    process.exit(0);
+  }
+
+  throw error;
+}

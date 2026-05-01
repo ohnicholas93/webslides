@@ -17,6 +17,16 @@ body {
   letter-spacing: 0;
 }
 
+body[data-webslides-mode="present"] [data-webslides-shell],
+body[data-webslides-mode="presenter"] [data-webslides-shell] {
+  display: none;
+}
+
+body[data-webslides-mode="present"],
+body[data-webslides-mode="presenter"] {
+  background: #08111f;
+}
+
 .figureCard img.figure {
   border: none;
   border-radius: 0;

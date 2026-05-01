@@ -37,7 +37,10 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PresentationSettingsProvider initialSettings={initialSettings}>
-          <div className="grid min-h-screen grid-rows-[auto_1fr]">
+          <div
+            className="grid min-h-screen grid-rows-[auto_1fr]"
+            data-webslides-shell
+          >
             <AppHeader />
             <div className="overflow-auto">{children}</div>
           </div>

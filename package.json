@@ -4,7 +4,9 @@
   "private": false,
   "packageManager": "bun@1.3.11",
   "scripts": {
-    "dev": "next dev",
+    "dev": "bun scripts/dev.mjs",
+    "dev:next": "next dev",
+    "dev:ws": "bun scripts/webslides-ws.mjs",
     "present:ws": "bun scripts/webslides-ws.mjs",
     "build": "next build",
     "start": "next start",
