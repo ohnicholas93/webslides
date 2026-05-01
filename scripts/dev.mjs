@@ -1,18 +1,26 @@
-const bun = Bun.which("bun") ?? "bun";
+import { spawn } from "node:child_process";
 
-const nextProc = Bun.spawn({
-  cmd: [bun, "run", "dev:next"],
-  stdin: "inherit",
-  stdout: "inherit",
-  stderr: "inherit",
-});
+const childProcesses = [];
 
-const wsProc = Bun.spawn({
-  cmd: [bun, "run", "dev:ws"],
-  stdin: "inherit",
-  stdout: "inherit",
-  stderr: "inherit",
-});
+function spawnProc(command, args, name) {
+  const proc = spawn(command, args, {
+    stdio: "inherit",
+    env: process.env,
+  });
+
+  proc.on("error", (error) => {
+    console.error(`[webslides] Failed to start ${name}:`, error);
+    exit(1, name);
+  });
+
+  childProcesses.push(proc);
+  return proc;
+}
+
+const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
+
+const nextProc = spawnProc(npmCommand, ["run", "dev:next"], "next");
+const wsProc = spawnProc(npmCommand, ["run", "dev:ws"], "ws");
 
 let shuttingDown = false;
 let exited = false;
@@ -21,9 +29,9 @@ const stopAll = () => {
   if (shuttingDown) return;
   shuttingDown = true;
 
-  for (const proc of [nextProc, wsProc]) {
+  for (const proc of childProcesses) {
     try {
-      proc.kill();
+      proc.kill("SIGTERM");
     } catch {
       // ignore kill failures
     }
@@ -49,8 +57,8 @@ for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
   });
 }
 
-nextProc.exited.then((code) => exit(code, "next"));
-wsProc.exited.then((code) => {
+nextProc.on("exit", (code) => exit(code, "next"));
+wsProc.on("exit", (code) => {
   if (code !== 0) {
     exit(code, "ws");
   }

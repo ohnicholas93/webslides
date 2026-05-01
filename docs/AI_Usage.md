@@ -21,13 +21,13 @@ Good generated decks should:
 
 ## 1) Set Up the Repo Locally
 
-Prerequisites: install **Bun** locally.
+Prerequisites: install **Node.js** and **npm** locally.
 
 ```bash
 git clone https://github.com/ohnicholas93/webslides.git
 cd webslides
-bun install
-bun run dev
+npm install
+npm run dev
 ```
 
 Open `http://localhost:3000` to preview the current deck.
@@ -115,7 +115,7 @@ Now produce `src/app/page.tsx`.
 Replace your local `src/app/page.tsx` with the model output, then run:
 
 ```bash
-bun run dev
+npm run dev
 ```
 
 Review every slide at `http://localhost:3000` and fix anything that looks cramped or clipped.
@@ -126,11 +126,12 @@ If your generated slides reference images, copy them into `public/assets/`. For 
 
 Then refresh the page and confirm all visuals load correctly.
 
-## 7) Export PNGs, Then Build a PowerPoint (Optional)
+## 7) Export the Deck
 
-1. Click **Export** in the header to download `slide-01.png`, `slide-02.png`, …
-2. Import the PNGs into Google Slides or Microsoft PowerPoint.
-3. Export/download as `.pptx` if you need a PowerPoint file.
+1. Click **Export** in the header.
+2. Choose `PNGs`, `PDF`, or `PPTX`.
+3. If you choose `PNGs`, you’ll get `slide-01.png`, `slide-02.png`, … inside a zip file.
+4. If you choose `PPTX`, the app generates a PowerPoint directly from rendered slide images.
 
 Tip: If a slide looks “too dense” after export, reduce text, increase spacing, or split it into two slides. You can describe any required changes with an AI Editor like Cursor.
 
