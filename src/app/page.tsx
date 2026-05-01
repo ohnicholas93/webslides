@@ -129,7 +129,7 @@ export default function Home() {
                 Agent-authored slide systems
               </Pill>
 
-              <h1 className="mt-9 text-6xl font-black leading-[0.98] tracking-tight">
+              <h1 className="mt-6 text-6xl font-black leading-[0.98] tracking-tight">
                 No global theme.
                 <br />
                 Every deck owns its visual language.
