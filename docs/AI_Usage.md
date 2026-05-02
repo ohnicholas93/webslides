@@ -36,7 +36,7 @@ Open `http://localhost:3000` to preview the current deck.
 
 Open the Repomix link below and export/copy the generated XML:
 
-[Repomix Link](https://repomix.com/?repo=ohnicholas93%2Fwebslides)
+[Repomix Link](https://repomix.com/?repo=ohnicholas93%2Fwebslides&ignore=src%2Fcore%2Fpresentation-runtime.tsx%2Csrc%2Fcore%2Fslide-exporter.tsx)
 
 Save it locally as something like `repomix.xml` (or keep it ready to paste into your LLM chat).
 
