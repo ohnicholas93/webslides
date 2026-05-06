@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 
@@ -103,7 +101,7 @@ export default function SettingsModal({
               Settings
             </h2>
             <p className="text-sm text-slate-500">
-              Saved automatically in cookies.
+              Saved automatically in this browser.
             </p>
           </div>
           <button

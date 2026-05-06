@@ -1,5 +1,3 @@
-"use client";
-
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 import { toPng } from "html-to-image";

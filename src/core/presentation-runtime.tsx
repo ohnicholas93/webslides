@@ -1,5 +1,3 @@
-"use client";
-
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -48,7 +46,8 @@ type SlideSnapshot = {
 };
 
 const LAST_SLIDE_INDEX_STORAGE_KEY = "webslides:last-slide-index";
-const NOTES_API_ENDPOINT = "/api/presenter-notes";
+const METADATA_STORAGE_KEY = "webslides:presentation-metadata";
+const DEFAULT_METADATA_URL = "metadata.json";
 
 function clampSlideIndex(index: number, slideCount: number) {
   if (slideCount <= 0) return 0;
@@ -56,32 +55,38 @@ function clampSlideIndex(index: number, slideCount: number) {
   return Math.min(Math.max(index, 0), slideCount - 1);
 }
 
-async function fetchMetadataFromFile(signal?: AbortSignal) {
-  const response = await fetch(NOTES_API_ENDPOINT, {
-    cache: "no-store",
-    signal,
-  });
-  if (!response.ok) {
-    throw new Error(`Unable to load presenter notes: ${response.status}`);
+async function readMetadataFromStorage(signal?: AbortSignal) {
+  const fallback = createDefaultMetadata();
+
+  try {
+    const raw = window.localStorage.getItem(METADATA_STORAGE_KEY);
+    if (raw) {
+      return normalizeMetadata(JSON.parse(raw), fallback);
+    }
+  } catch {
+    // Fall through to bundled defaults.
   }
 
-  return normalizeMetadata(await response.json());
+  try {
+    const response = await fetch(DEFAULT_METADATA_URL, {
+      cache: "no-store",
+      signal,
+    });
+
+    if (response.ok) {
+      return normalizeMetadata(await response.json(), fallback);
+    }
+  } catch {
+    // Static deployments may not include metadata.json; defaults are enough.
+  }
+
+  return fallback;
 }
 
-async function saveMetadataToFile(metadata: PresentationMetadata) {
-  const response = await fetch(NOTES_API_ENDPOINT, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(metadata),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Unable to save presenter notes: ${response.status}`);
-  }
-
-  return normalizeMetadata(await response.json(), metadata);
+async function saveMetadataToStorage(metadata: PresentationMetadata) {
+  const next = normalizeMetadata(metadata);
+  window.localStorage.setItem(METADATA_STORAGE_KEY, JSON.stringify(next));
+  return next;
 }
 
 function getSlideSnapshots() {
@@ -472,19 +477,19 @@ function MetadataModal({
   const statusMeta =
     notesSyncState === "error"
       ? {
-          detail: "Notes could not bewritten",
+          detail: "Notes could not be saved",
           tone: "border-rose-200 bg-rose-50 text-rose-700",
           icon: CircleSlash2,
         }
       : notesSyncState === "saving"
         ? {
-            detail: "Writing to disk...",
+            detail: "Saving locally...",
             tone: "border-amber-200 bg-amber-50 text-amber-700",
             icon: Clock3,
           }
         : notesSyncState === "loading"
           ? {
-              detail: "Reading from disk...",
+              detail: "Loading local notes...",
               tone: "border-slate-200 bg-slate-100 text-slate-600",
               icon: Clock3,
             }
@@ -501,7 +506,7 @@ function MetadataModal({
                   icon: Clock3,
                 }
               : {
-                  detail: "Notes still saved",
+                  detail: "Notes saved locally",
                   tone: "border-slate-200 bg-slate-100 text-slate-600",
                   icon: CircleSlash2,
                 };
@@ -768,7 +773,7 @@ export default function PresentationRuntimeControls() {
       isSavingMetadataRef.current = true;
 
       try {
-        const saved = await saveMetadataToFile(next);
+        const saved = await saveMetadataToStorage(next);
         setMetadata((current) => {
           if (metadataFingerprint(current) !== metadataFingerprint(next)) {
             return current;
@@ -798,7 +803,7 @@ export default function PresentationRuntimeControls() {
       }
 
       try {
-        const next = await fetchMetadataFromFile();
+        const next = await readMetadataFromStorage();
         setMetadata((current) => {
           if (metadataFingerprint(current) === metadataFingerprint(next)) {
             metadataRef.current = current;
@@ -1002,7 +1007,7 @@ export default function PresentationRuntimeControls() {
       socketRef.current?.close();
       socketRef.current = null;
     };
-  }, [clientId, sendMessage, sessionId, wsUrl]);
+  }, [clientId, persistMetadata, sendMessage, sessionId, wsUrl]);
 
   useEffect(() => {
     if (!mode) return;

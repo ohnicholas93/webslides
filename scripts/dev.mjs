@@ -19,7 +19,7 @@ function spawnProc(command, args, name) {
 
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
 
-const nextProc = spawnProc(npmCommand, ["run", "dev:next"], "next");
+const viteProc = spawnProc(npmCommand, ["run", "dev:vite"], "vite");
 const wsProc = spawnProc(npmCommand, ["run", "dev:ws"], "ws");
 
 let shuttingDown = false;
@@ -57,7 +57,7 @@ for (const signal of ["SIGINT", "SIGTERM", "SIGHUP"]) {
   });
 }
 
-nextProc.on("exit", (code) => exit(code, "next"));
+viteProc.on("exit", (code) => exit(code, "vite"));
 wsProc.on("exit", (code) => {
   if (code !== 0) {
     exit(code, "ws");

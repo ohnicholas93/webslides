@@ -13,11 +13,12 @@
 # testing
 /coverage
 
-# next.js
+# framework caches
 /.next/
 /out/
 
 # production
+/dist/
 /build
 
 # misc
@@ -26,7 +27,6 @@
 
 # debug
 npm-debug.log*
-package-lock.json
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
@@ -39,7 +39,6 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 materials/
 .*/
 .codex

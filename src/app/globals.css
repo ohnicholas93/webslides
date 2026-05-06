@@ -3,6 +3,8 @@
 :root {
   font-size: 22px;
   box-sizing: content-box;
+  --font-geist-sans: "Space Grotesk", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-geist-mono: "SFMono-Regular", "Cascadia Code", "Liberation Mono", "Menlo", "Consolas", monospace;
 }
 
 @theme inline {

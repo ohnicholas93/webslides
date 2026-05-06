@@ -1,5 +1,3 @@
-"use client";
-
 import {
   createContext,
   useCallback,
@@ -14,7 +12,8 @@ import {
   getExportPixelRatio,
   type AspectRatioKey,
   type PresentationSettings,
-  PRESENTATION_COOKIE_KEYS,
+  PRESENTATION_SETTINGS_STORAGE_KEYS,
+  readPresentationSettingsFromStorage,
   type ResolutionKey,
 } from "@/lib/presentation-settings";
 
@@ -30,20 +29,23 @@ type PresentationSettingsContextValue = {
 const PresentationSettingsContext =
   createContext<PresentationSettingsContextValue | null>(null);
 
-function setCookie(name: string, value: string) {
-  const maxAgeSeconds = 60 * 60 * 24 * 365;
-  const parts = [
-    `${name}=${encodeURIComponent(value)}`,
-    "Path=/",
-    `Max-Age=${maxAgeSeconds}`,
-    "SameSite=Lax",
-  ];
+function readInitialSettings(initialSettings?: PresentationSettings) {
+  if (initialSettings) return initialSettings;
+  if (typeof window === "undefined") return defaultPresentationSettings;
 
-  if (typeof window !== "undefined" && window.location.protocol === "https:") {
-    parts.push("Secure");
+  try {
+    return readPresentationSettingsFromStorage(window.localStorage);
+  } catch {
+    return defaultPresentationSettings;
   }
+}
 
-  document.cookie = parts.join("; ");
+function setStoredValue(name: string, value: string) {
+  try {
+    window.localStorage.setItem(name, value);
+  } catch {
+    // Storage may be unavailable in private browsing or locked-down contexts.
+  }
 }
 
 export function PresentationSettingsProvider({
@@ -54,13 +56,13 @@ export function PresentationSettingsProvider({
   initialSettings?: PresentationSettings;
 }) {
   const [settings, setSettings] = useState<PresentationSettings>(
-    initialSettings ?? defaultPresentationSettings
+    () => readInitialSettings(initialSettings)
   );
 
   const setAspectRatio = useCallback((value: AspectRatioKey) => {
     setSettings((prev) => {
       const next = { ...prev, aspectRatio: value };
-      setCookie(PRESENTATION_COOKIE_KEYS.aspectRatio, value);
+      setStoredValue(PRESENTATION_SETTINGS_STORAGE_KEYS.aspectRatio, value);
       return next;
     });
   }, []);
@@ -68,7 +70,7 @@ export function PresentationSettingsProvider({
   const setResolution = useCallback((value: ResolutionKey) => {
     setSettings((prev) => {
       const next = { ...prev, resolution: value };
-      setCookie(PRESENTATION_COOKIE_KEYS.resolution, value);
+      setStoredValue(PRESENTATION_SETTINGS_STORAGE_KEYS.resolution, value);
       return next;
     });
   }, []);
@@ -76,7 +78,10 @@ export function PresentationSettingsProvider({
   const setSafeAutoSizing = useCallback((value: boolean) => {
     setSettings((prev) => {
       const next = { ...prev, safeAutoSizing: value };
-      setCookie(PRESENTATION_COOKIE_KEYS.safeAutoSizing, value ? "1" : "0");
+      setStoredValue(
+        PRESENTATION_SETTINGS_STORAGE_KEYS.safeAutoSizing,
+        value ? "1" : "0"
+      );
       return next;
     });
   }, []);

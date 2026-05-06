@@ -30,7 +30,7 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000` to preview the current deck.
+Open `http://localhost:5173` to preview the current deck.
 
 ## 2) Get a Repomix Snapshot
 
@@ -63,7 +63,7 @@ Sample images are useful for understanding scale and rendering behavior. They ar
 Adjust the prompt below based on your requirements. Then, paste the prompt after you’ve provided the context above.
 
 ```text
-You are helping me generate slides for the WebSlides repo (Next.js + React + Tailwind).
+You are helping me generate slides for the WebSlides repo (React + Vite + Tailwind).
 
 Goal:
 - Generate a complete replacement for `src/app/page.tsx` that renders my deck using the existing components in the repo.
@@ -118,7 +118,7 @@ Replace your local `src/app/page.tsx` with the model output, then run:
 npm run dev
 ```
 
-Review every slide at `http://localhost:3000` and fix anything that looks cramped or clipped.
+Review every slide at `http://localhost:5173` and fix anything that looks cramped or clipped.
 
 ## 6) Add/Update Assets
 

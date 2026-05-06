@@ -34,7 +34,6 @@ export default function CustomImage({
 
   return (
     // Native img keeps export/canvas capture predictable for slide rendering.
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       ref={imgRef}
       src={source}

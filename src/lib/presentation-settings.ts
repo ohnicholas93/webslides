@@ -1,4 +1,4 @@
-export const PRESENTATION_COOKIE_KEYS = {
+export const PRESENTATION_SETTINGS_STORAGE_KEYS = {
   aspectRatio: "webslides_aspect_ratio",
   resolution: "webslides_resolution",
   safeAutoSizing: "webslides_safe_auto_sizing",
@@ -78,18 +78,18 @@ export function getExportSlideSize(settings: PresentationSettings) {
   };
 }
 
-type CookieStoreLike = {
-  get: (name: string) => { value: string } | undefined;
+type StorageLike = {
+  getItem: (name: string) => string | null;
 };
 
-export function readPresentationSettingsFromCookieStore(
-  store: CookieStoreLike,
+export function readPresentationSettingsFromStorage(
+  storage: StorageLike,
   fallback: PresentationSettings = defaultPresentationSettings
 ): PresentationSettings {
-  const rawAspect = store.get(PRESENTATION_COOKIE_KEYS.aspectRatio)?.value;
-  const rawRes = store.get(PRESENTATION_COOKIE_KEYS.resolution)?.value;
+  const rawAspect = storage.getItem(PRESENTATION_SETTINGS_STORAGE_KEYS.aspectRatio);
+  const rawRes = storage.getItem(PRESENTATION_SETTINGS_STORAGE_KEYS.resolution);
   const rawSafeAutoSizing =
-    store.get(PRESENTATION_COOKIE_KEYS.safeAutoSizing)?.value;
+    storage.getItem(PRESENTATION_SETTINGS_STORAGE_KEYS.safeAutoSizing);
   const safeAutoSizingParsed = parseCookieBoolean(rawSafeAutoSizing);
 
   return {
