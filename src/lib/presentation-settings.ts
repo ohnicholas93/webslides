@@ -9,6 +9,19 @@ export const aspectRatioOptions = [
   { key: "4:3", label: "4:3 (Standard)", w: 4, h: 3 },
   { key: "1:1", label: "1:1 (Square)", w: 1, h: 1 },
   { key: "21:9", label: "21:9 (Ultrawide)", w: 21, h: 9 },
+  {
+    key: "A4",
+    label: "A4 (Portrait)",
+    w: 210,
+    h: 297,
+    pdfPage: {
+      format: "a4",
+      orientation: "portrait",
+      unit: "mm",
+      width: 210,
+      height: 297,
+    },
+  },
 ] as const;
 
 export type AspectRatioKey = (typeof aspectRatioOptions)[number]["key"];
@@ -53,6 +66,22 @@ function getAspectRatioNumbers(aspectRatio: AspectRatioKey) {
   const option = aspectRatioOptions.find((o) => o.key === aspectRatio);
   if (!option) return { w: 16, h: 9 };
   return { w: option.w, h: option.h };
+}
+
+export function getPdfPageSize(settings: PresentationSettings) {
+  const option = aspectRatioOptions.find((o) => o.key === settings.aspectRatio);
+  if (option && "pdfPage" in option) {
+    return option.pdfPage;
+  }
+
+  const slide = getExportSlideSize(settings);
+  return {
+    format: [slide.width, slide.height] as [number, number],
+    orientation: slide.width >= slide.height ? "landscape" : "portrait",
+    unit: "px",
+    width: slide.width,
+    height: slide.height,
+  } as const;
 }
 
 export function getDomSlideSize(settings: PresentationSettings) {

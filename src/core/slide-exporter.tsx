@@ -7,6 +7,7 @@ import { Download, FileArchive, FileImage, FileText, X } from "lucide-react";
 import PptxGenJS from "pptxgenjs";
 
 import { usePresentationSettings } from "@/core/presentation-settings";
+import { getPdfPageSize } from "@/lib/presentation-settings";
 import { cn } from "@/lib/utils";
 
 interface SlideExporterProps {
@@ -144,7 +145,7 @@ export default function SlideExporter({
   onExportComplete,
   variant = "page",
 }: SlideExporterProps) {
-  const { domSlideSize, exportPixelRatio } = usePresentationSettings();
+  const { domSlideSize, exportPixelRatio, settings } = usePresentationSettings();
   const [activeExport, setActiveExport] = useState<ExportFormat | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toast, setToast] = useState<ExportToast>({
@@ -279,13 +280,11 @@ export default function SlideExporter({
   };
 
   const exportPdf = async (slides: CapturedSlide[]) => {
-    const width = Math.round(domSlideSize.width * exportPixelRatio);
-    const height = Math.round(domSlideSize.height * exportPixelRatio);
-    const orientation = width >= height ? "landscape" : "portrait";
+    const { format, orientation, unit, width, height } = getPdfPageSize(settings);
     const pdf = new jsPDF({
       orientation,
-      unit: "px",
-      format: [width, height],
+      unit,
+      format,
       compress: true,
     });
 
