@@ -21,7 +21,14 @@ body {
 
 body[data-webslides-mode="present"] [data-webslides-shell],
 body[data-webslides-mode="presenter"] [data-webslides-shell] {
-  display: none;
+  position: fixed;
+  top: 0;
+  left: -200vw;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
 }
 
 body[data-webslides-mode="present"],

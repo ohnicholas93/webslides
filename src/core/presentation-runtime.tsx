@@ -1,5 +1,5 @@
 import { createPortal } from "react-dom";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -48,6 +48,7 @@ type SlideSnapshot = {
 const LAST_SLIDE_INDEX_STORAGE_KEY = "webslides:last-slide-index";
 const METADATA_STORAGE_KEY = "webslides:presentation-metadata";
 const DEFAULT_METADATA_URL = "metadata.json";
+const SOURCE_SLIDE_SELECTOR = "[data-webslides-shell] section[data-slide]";
 
 function clampSlideIndex(index: number, slideCount: number) {
   if (slideCount <= 0) return 0;
@@ -90,11 +91,22 @@ async function saveMetadataToStorage(metadata: PresentationMetadata) {
 }
 
 function getSlideSnapshots() {
-  return Array.from(document.querySelectorAll<HTMLElement>("main section[data-slide]"))
-    .map((slide, index) => ({
+  return Array.from(
+    document.querySelectorAll<HTMLElement>(SOURCE_SLIDE_SELECTOR)
+  ).map((slide, index) => ({
       html: slide.outerHTML,
       title: slide.dataset.slideTitle || `Slide ${index + 1}`,
     }));
+}
+
+function areSlideSnapshotsEqual(a: SlideSnapshot[], b: SlideSnapshot[]) {
+  return (
+    a.length === b.length &&
+    a.every((slide, index) => {
+      const next = b[index];
+      return slide.html === next.html && slide.title === next.title;
+    })
+  );
 }
 
 function readStoredSlideIndex() {
@@ -105,24 +117,72 @@ function readStoredSlideIndex() {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function SlidePreview({
+const SlidePreview = memo(function SlidePreview({
   slide,
   scale,
   className,
   emptyState,
+  sourceSlideIndex,
 }: {
   slide?: SlideSnapshot;
   scale: number;
   className?: string;
   emptyState?: React.ReactNode;
+  sourceSlideIndex?: number;
 }) {
   const { domSlideSize } = usePresentationSettings();
+  const previewRef = useRef<HTMLDivElement>(null);
   const scaledWidth = Math.round(domSlideSize.width * scale);
   const scaledHeight = Math.round(domSlideSize.height * scale);
+
+  useEffect(() => {
+    if (sourceSlideIndex === undefined) return;
+
+    let frame = 0;
+    const syncCanvases = () => {
+      const preview = previewRef.current;
+      const sourceSlide =
+        document.querySelectorAll<HTMLElement>(SOURCE_SLIDE_SELECTOR)[
+          sourceSlideIndex
+        ];
+
+      if (!preview || !sourceSlide) {
+        frame = window.requestAnimationFrame(syncCanvases);
+        return;
+      }
+
+      const sourceCanvases = Array.from(
+        sourceSlide.querySelectorAll<HTMLCanvasElement>("canvas")
+      );
+      const targetCanvases = Array.from(
+        preview.querySelectorAll<HTMLCanvasElement>("canvas")
+      );
+
+      targetCanvases.forEach((target, index) => {
+        const source = sourceCanvases[index];
+        if (!source) return;
+
+        if (target.width !== source.width) target.width = source.width;
+        if (target.height !== source.height) target.height = source.height;
+
+        const context = target.getContext("2d");
+        if (!context) return;
+
+        context.clearRect(0, 0, target.width, target.height);
+        context.drawImage(source, 0, 0);
+      });
+
+      frame = window.requestAnimationFrame(syncCanvases);
+    };
+
+    syncCanvases();
+    return () => window.cancelAnimationFrame(frame);
+  }, [slide?.html, sourceSlideIndex]);
 
   if (!slide) {
     return (
       <div
+        ref={previewRef}
         className={cn("grid place-items-center", className)}
         style={{
           width: scaledWidth,
@@ -140,6 +200,7 @@ function SlidePreview({
 
   return (
     <div
+      ref={previewRef}
       className={cn("relative overflow-hidden", className)}
       style={{
         width: scaledWidth,
@@ -157,7 +218,14 @@ function SlidePreview({
       />
     </div>
   );
-}
+}, (prev, next) =>
+  prev.slide?.html === next.slide?.html &&
+  prev.slide?.title === next.slide?.title &&
+  prev.scale === next.scale &&
+  prev.className === next.className &&
+  prev.emptyState === next.emptyState &&
+  prev.sourceSlideIndex === next.sourceSlideIndex
+);
 
 function RuntimeButton({
   children,
@@ -315,6 +383,7 @@ function PresentationOverlay({
             slide={currentSlide}
             scale={scale}
             className="rounded-none shadow-none"
+            sourceSlideIndex={slideIndex}
           />
         </div>
       </div>,
@@ -370,6 +439,7 @@ function PresentationOverlay({
               slide={currentSlide}
               scale={scale}
               className="rounded-none shadow-[0_50px_140px_rgba(0,0,0,0.48)]"
+              sourceSlideIndex={slideIndex}
             />
           </div>
 
@@ -410,6 +480,7 @@ function PresentationOverlay({
                   slide={nextSlide}
                   scale={Math.min(0.065, 72 / domSlideSize.width)}
                   className="rounded-md"
+                  sourceSlideIndex={nextSlide ? slideIndex + 1 : undefined}
                   emptyState={
                     <div className="grid h-full w-full place-items-center rounded-md border border-white/8 bg-white/[0.03] text-white/40">
                       <CircleSlash2 className="h-4 w-4" />
@@ -899,7 +970,9 @@ export default function PresentationRuntimeControls() {
   useEffect(() => {
     const updateSlides = () => {
       const snapshots = getSlideSnapshots();
-      setSlides(snapshots);
+      setSlides((current) =>
+        areSlideSnapshotsEqual(current, snapshots) ? current : snapshots
+      );
       setSlideIndex((current) => {
         const clamped = clampSlideIndex(current, snapshots.length);
         window.localStorage.setItem(LAST_SLIDE_INDEX_STORAGE_KEY, String(clamped));
@@ -910,9 +983,11 @@ export default function PresentationRuntimeControls() {
     updateSlides();
     const frame = window.requestAnimationFrame(updateSlides);
     const observer = new MutationObserver(updateSlides);
-    const main = document.querySelector("main");
-    if (main) {
-      observer.observe(main, { childList: true, subtree: true });
+    const slideRoot =
+      document.querySelector(SOURCE_SLIDE_SELECTOR)?.parentElement ??
+      document.getElementById("root");
+    if (slideRoot) {
+      observer.observe(slideRoot, { childList: true, subtree: true });
     }
 
     return () => {
